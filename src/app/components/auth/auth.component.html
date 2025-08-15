@@ -1,0 +1,226 @@
+<div class="auth-container">
+  <div class="row g-0 h-100">
+    <!-- Left Side - Logo and App Title -->
+    <div class="col-lg-6 col-md-6 d-none d-md-flex align-items-center justify-content-center bg-primary text-white">
+      <div class="text-center">
+        <div class="logo-container mb-4">
+          <i class="fas fa-calendar-alt fa-5x mb-3"></i>
+        </div>
+        <h1 class="display-4 fw-bold mb-3">Quản lý sự kiện</h1>
+        <p class="lead">Tổ chức và quản lý các sự kiện của bạn một cách dễ dàng</p>
+      </div>
+    </div>
+
+    <!-- Right Side - Authentication Forms -->
+    <div class="col-lg-6 col-md-6 col-12 d-flex align-items-center justify-content-center">
+      <div class="auth-form-container">
+        <div class="card shadow-lg border-0">
+          <div class="card-body p-5">
+
+            <!-- Sign In Form -->
+            @if (isSignIn) {
+              <div class="text-center mb-4">
+                <h2 class="fw-bold text-primary">Chào mừng trở lại</h2>
+                <p class="text-muted">Đăng nhập vào tài khoản của bạn</p>
+              </div>
+
+              <form [formGroup]="signInForm" (ngSubmit)="onSignIn()">
+                <div class="mb-3">
+                  <label for="signInEmail" class="form-label">Email</label>
+                  <input
+                    type="email"
+                    class="form-control form-control-lg"
+                    id="signInEmail"
+                    formControlName="email"
+                    [class.is-invalid]="signInForm.get('email')?.invalid && signInForm.get('email')?.touched"
+                    placeholder="Nhập email của bạn">
+                  @if (signInForm.get('email')?.invalid && signInForm.get('email')?.touched) {
+                    <div class="invalid-feedback">
+                      {{ getSignInEmailError() }}
+                    </div>
+                  }
+                </div>
+
+                <div class="mb-4">
+                  <label for="signInPassword" class="form-label">Mật khẩu</label>
+                  <input
+                    type="password"
+                    class="form-control form-control-lg"
+                    id="signInPassword"
+                    formControlName="password"
+                    [class.is-invalid]="signInForm.get('password')?.invalid && signInForm.get('password')?.touched"
+                    placeholder="Nhập mật khẩu của bạn">
+                  @if (signInForm.get('password')?.invalid && signInForm.get('password')?.touched) {
+                    <div class="invalid-feedback">
+                      {{ getSignInPasswordError() }}
+                    </div>
+                  }
+                </div>
+
+                <button
+                  type="submit"
+                  class="btn btn-primary btn-lg w-100 mb-3"
+                  [disabled]="signInForm.invalid">
+                  Đăng nhập
+                </button>
+
+                <div class="text-center">
+                  <span class="text-muted">Chưa có tài khoản? </span>
+                  <a href="javascript:void(0)" class="text-primary fw-bold" (click)="toggleAuthMode()">
+                    Đăng ký
+                  </a>
+                </div>
+              </form>
+            }
+
+            <!-- Sign Up Form -->
+            @if (!isSignIn) {
+              <div class="text-center mb-4">
+                <h2 class="fw-bold text-primary">Tạo tài khoản</h2>
+                <p class="text-muted">Tham gia cùng chúng tôi ngay hôm nay</p>
+              </div>
+
+              <form [formGroup]="signUpForm" (ngSubmit)="onSignUp()" class="signup-form">
+                <div class="mb-3">
+                  <label for="signUpEmail" class="form-label">Email cá nhân</label>
+                  <input
+                    type="email"
+                    class="form-control"
+                    id="signUpEmail"
+                    formControlName="email"
+                    [class.is-invalid]="signUpForm.get('email')?.invalid && signUpForm.get('email')?.touched"
+                    placeholder="Nhập email cá nhân">
+                  @if (signUpForm.get('email')?.invalid && signUpForm.get('email')?.touched) {
+                    <div class="invalid-feedback">
+                      {{ getSignUpEmailError() }}
+                    </div>
+                  }
+                </div>
+
+                <div class="mb-3">
+                  <label for="workEmail" class="form-label">Email công việc</label>
+                  <input
+                    type="email"
+                    class="form-control"
+                    id="workEmail"
+                    formControlName="workEmail"
+                    [class.is-invalid]="signUpForm.get('workEmail')?.invalid && signUpForm.get('workEmail')?.touched"
+                    placeholder="Nhập email công việc">
+                  @if (signUpForm.get('workEmail')?.invalid && signUpForm.get('workEmail')?.touched) {
+                    <div class="invalid-feedback">
+                      {{ getWorkEmailError() }}
+                    </div>
+                  }
+                </div>
+
+                <div class="mb-3">
+                  <label for="fullName" class="form-label">Họ và tên</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="fullName"
+                    formControlName="fullName"
+                    [class.is-invalid]="signUpForm.get('fullName')?.invalid && signUpForm.get('fullName')?.touched"
+                    placeholder="Nhập họ và tên đầy đủ">
+                  @if (signUpForm.get('fullName')?.invalid && signUpForm.get('fullName')?.touched) {
+                    <div class="invalid-feedback">
+                      {{ getFullNameError() }}
+                    </div>
+                  }
+                </div>
+
+                <div class="mb-3">
+                  <label for="phoneNumber" class="form-label">Số điện thoại</label>
+                  <input
+                    type="tel"
+                    class="form-control"
+                    id="phoneNumber"
+                    formControlName="phoneNumber"
+                    [class.is-invalid]="signUpForm.get('phoneNumber')?.invalid && signUpForm.get('phoneNumber')?.touched"
+                    placeholder="Nhập số điện thoại">
+                  @if (signUpForm.get('phoneNumber')?.invalid && signUpForm.get('phoneNumber')?.touched) {
+                    <div class="invalid-feedback">
+                      {{ getPhoneNumberError() }}
+                    </div>
+                  }
+                </div>
+
+                <div class="row">
+                  <div class="col-md-6 mb-3">
+                    <label for="academicRank" class="form-label">Chức danh học thuật</label>
+                    <select
+                      class="form-select"
+                      id="academicRank"
+                      formControlName="academicRank"
+                      [class.is-invalid]="signUpForm.get('academicRank')?.invalid && signUpForm.get('academicRank')?.touched">
+                      <option value="">Chọn chức danh</option>
+                      <option value="Giảng viên">Giảng viên</option>
+                      <option value="Phó giáo sư">Phó giáo sư</option>
+                      <option value="Giáo sư">Giáo sư</option>
+                      <option value="Nghiên cứu viên">Nghiên cứu viên</option>
+                    </select>
+                    @if (signUpForm.get('academicRank')?.invalid && signUpForm.get('academicRank')?.touched) {
+                      <div class="invalid-feedback">
+                        {{ getAcademicRankError() }}
+                      </div>
+                    }
+                  </div>
+
+                  <div class="col-md-6 mb-3">
+                    <label for="academicDegree" class="form-label">Học vị</label>
+                    <select
+                      class="form-select"
+                      id="academicDegree"
+                      formControlName="academicDegree"
+                      [class.is-invalid]="signUpForm.get('academicDegree')?.invalid && signUpForm.get('academicDegree')?.touched">
+                      <option value="">Chọn học vị</option>
+                      <option value="Cử nhân">Cử nhân</option>
+                      <option value="Thạc sĩ">Thạc sĩ</option>
+                      <option value="Tiến sĩ">Tiến sĩ</option>
+                    </select>
+                    @if (signUpForm.get('academicDegree')?.invalid && signUpForm.get('academicDegree')?.touched) {
+                      <div class="invalid-feedback">
+                        {{ getAcademicDegreeError() }}
+                      </div>
+                    }
+                  </div>
+                </div>
+
+                <div class="mb-4">
+                  <label for="signUpPassword" class="form-label">Mật khẩu</label>
+                  <input
+                    type="password"
+                    class="form-control"
+                    id="signUpPassword"
+                    formControlName="password"
+                    [class.is-invalid]="signUpForm.get('password')?.invalid && signUpForm.get('password')?.touched"
+                    placeholder="Tạo mật khẩu">
+                  @if (signUpForm.get('password')?.invalid && signUpForm.get('password')?.touched) {
+                    <div class="invalid-feedback">
+                      {{ getSignUpPasswordError() }}
+                    </div>
+                  }
+                </div>
+
+                <button
+                  type="submit"
+                  class="btn btn-primary btn-lg w-100 mb-3"
+                  [disabled]="signUpForm.invalid">
+                  Đăng ký
+                </button>
+
+                <div class="text-center">
+                  <span class="text-muted">Đã có tài khoản? </span>
+                  <a href="javascript:void(0)" class="text-primary fw-bold" (click)="toggleAuthMode()">
+                    Đăng nhập
+                  </a>
+                </div>
+              </form>
+            }
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
