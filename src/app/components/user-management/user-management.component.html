@@ -12,14 +12,14 @@
                 <div class="card-body">
                     <div class="row g-3">
                         <!-- Search -->
-                        <div class="col-md-4">
+                        <div class="col-12 col-md-6 col-lg-4">
                             <label class="form-label">Tìm kiếm</label>
                             <input type="text" class="form-control" placeholder="Tên, email hoặc số điện thoại..."
                                 #searchInput [value]="searchTerm()" (input)="onSearch(searchInput.value)">
                         </div>
 
                         <!-- Role Filter -->
-                        <div class="col-md-2">
+                        <div class="col-6 col-md-3 col-lg-2">
                             <label class="form-label">Vai trò</label>
                             <select #roleSelect class="form-select" [value]="selectedRole()"
                                 (change)="onRoleFilter(roleSelect.value)">
@@ -31,7 +31,7 @@
                         </div>
 
                         <!-- Academic Rank Filter -->
-                        <div class="col-md-2">
+                        <div class="col-6 col-md-3 col-lg-2">
                             <label class="form-label">Học hàm</label>
                             <select #rankSelect class="form-select" [value]="selectedAcademicRank()"
                                 (change)="onAcademicRankFilter(rankSelect.value)">
@@ -43,7 +43,7 @@
                         </div>
 
                         <!-- Academic Degree Filter -->
-                        <div class="col-md-2">
+                        <div class="col-6 col-md-6 col-lg-2">
                             <label class="form-label">Học vị</label>
                             <select #degreeSelect class="form-select" [value]="selectedAcademicDegree()"
                                 (change)="onAcademicDegreeFilter(degreeSelect.value)">
@@ -55,9 +55,11 @@
                         </div>
 
                         <!-- Clear Filters -->
-                        <div class="col-md-2 d-flex align-items-end">
+                        <div class="col-6 col-md-3 col-lg-2 d-flex align-items-end">
                             <button type="button" class="btn btn-outline-secondary w-100" (click)="clearFilters()">
-                                <i class="fas fa-times me-2"></i>Xóa bộ lọc
+                                <i class="fas fa-times d-none d-sm-inline me-2"></i>
+                                <span class="d-none d-sm-inline">Xóa bộ lọc</span>
+                                <i class="fas fa-times d-sm-none"></i>
                             </button>
                         </div>
                     </div>
@@ -98,64 +100,139 @@
                         <p class="text-muted">Không có người dùng nào được tìm thấy</p>
                     </div>
                     } @else {
-                    <div class="table-responsive">
-                        <table class="table table-hover">
-                            <thead class="table-light">
-                                <tr>
-                                    <th>Tên</th>
-                                    <th>Email</th>
-                                    <th>Số điện thoại</th>
-                                    <th>Học hàm</th>
-                                    <th>Học vị</th>
-                                    <th>Vai trò</th>
-                                    <th class="text-center">Thao tác</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @for (user of paginatedUsers(); track user.id) {
-                                <tr>
-                                    <td>
-                                        <div class="d-flex align-items-center">
-                                            <div class="user-avatar me-3">
-                                                <i class="fas fa-user"></i>
+
+                    <!-- Desktop Table View -->
+                    <div class="d-none d-lg-block">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Tên</th>
+                                        <th>Email</th>
+                                        <th>Số điện thoại</th>
+                                        <th>Học hàm</th>
+                                        <th>Học vị</th>
+                                        <th>Vai trò</th>
+                                        <th class="text-center">Thao tác</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @for (user of paginatedUsers(); track user.id) {
+                                    <tr>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <div class="user-avatar me-3">
+                                                    <i class="fas fa-user"></i>
+                                                </div>
+                                                <div>
+                                                    <div class="fw-bold">{{ user.fullName }}</div>
+                                                    @if (user.workEmail) {
+                                                    <small class="text-muted">{{ user.workEmail }}</small>
+                                                    }
+                                                </div>
                                             </div>
+                                        </td>
+                                        <td>{{ user.email }}</td>
+                                        <td>{{ user.phoneNumber }}</td>
+                                        <td>{{ getAcademicRankDisplay(user.academicRank) }}</td>
+                                        <td>{{ getAcademicDegreeDisplay(user.academicDegree) }}</td>
+                                        <td>
+                                            @for (role of user.roles; track role.name) {
+                                            <span class="badge me-1" [class.bg-primary]="role.name === 'ADMIN'"
+                                                [class.bg-secondary]="role.name === 'USER'">
+                                                {{ role.name }}
+                                            </span>
+                                            }
+                                        </td>
+                                        <td class="text-center">
+                                            <div class="btn-group" role="group">
+                                                <button type="button" class="btn btn-sm btn-outline-primary"
+                                                    (click)="openEditModal(user)" [disabled]="loading()">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                <button type="button" class="btn btn-sm btn-outline-danger"
+                                                    (click)="openDeleteModal(user)" [disabled]="loading()">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Mobile/Tablet Card View -->
+                    <div class="d-lg-none">
+                        @for (user of paginatedUsers(); track user.id) {
+                        <div class="card user-card mb-3">
+                            <div class="card-body">
+                                <!-- User Header -->
+                                <div class="d-flex align-items-center mb-3">
+                                    <div class="user-avatar me-3">
+                                        <i class="fas fa-user"></i>
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <h6 class="mb-1 fw-bold">{{ user.fullName }}</h6>
+                                        <div class="d-flex flex-wrap gap-1 mb-1">
+                                            @for (role of user.roles; track role.name) {
+                                            <span class="badge" [class.bg-primary]="role.name === 'ADMIN'"
+                                                [class.bg-secondary]="role.name === 'USER'">
+                                                {{ role.name }}
+                                            </span>
+                                            }
+                                        </div>
+                                    </div>
+                                    <div class="btn-group">
+                                        <button class="btn btn-sm btn-outline-primary me-1"
+                                            (click)="openEditModal(user)">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-danger" (click)="openDeleteModal(user)">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- User Details -->
+                                <div class="row g-2 small">
+                                    <div class="col-12">
+                                        <div class="d-flex">
+                                            <i class="fas fa-envelope text-muted me-2 mt-1"></i>
                                             <div>
-                                                <div class="fw-bold">{{ user.fullName }}</div>
+                                                <div>{{ user.email }}</div>
                                                 @if (user.workEmail) {
-                                                <small class="text-muted">{{ user.workEmail }}</small>
+                                                <div class="text-muted">{{ user.workEmail }}</div>
                                                 }
                                             </div>
                                         </div>
-                                    </td>
-                                    <td>{{ user.email }}</td>
-                                    <td>{{ user.phoneNumber }}</td>
-                                    <td>{{ getAcademicRankDisplay(user.academicRank) }}</td>
-                                    <td>{{ getAcademicDegreeDisplay(user.academicDegree) }}</td>
-                                    <td>
-                                        @for (role of user.roles; track role.name) {
-                                        <span class="badge me-1" [class.bg-primary]="role.name === 'ADMIN'"
-                                            [class.bg-secondary]="role.name === 'USER'">
-                                            {{ role.name }}
-                                        </span>
-                                        }
-                                    </td>
-                                    <td class="text-center">
-                                        <div class="btn-group" role="group">
-                                            <button type="button" class="btn btn-sm btn-outline-primary"
-                                                (click)="openEditModal(user)" [disabled]="loading()">
-                                                <i class="fas fa-edit"></i>
-                                            </button>
-                                            <button type="button" class="btn btn-sm btn-outline-danger"
-                                                (click)="openDeleteModal(user)" [disabled]="loading()">
-                                                <i class="fas fa-trash"></i>
-                                            </button>
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="d-flex">
+                                            <i class="fas fa-phone text-muted me-2 mt-1"></i>
+                                            <span>{{ user.phoneNumber }}</span>
                                         </div>
-                                    </td>
-                                </tr>
-                                }
-                            </tbody>
-                        </table>
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="d-flex">
+                                            <i class="fas fa-graduation-cap text-muted me-2 mt-1"></i>
+                                            <span>{{ getAcademicRankDisplay(user.academicRank) }}</span>
+                                        </div>
+                                    </div>
+                                    <div class="col-12">
+                                        <div class="d-flex">
+                                            <i class="fas fa-certificate text-muted me-2 mt-1"></i>
+                                            <span>{{ getAcademicDegreeDisplay(user.academicDegree) }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        }
                     </div>
+
+                    }
 
                     <!-- Pagination -->
                     @if (totalPages() > 1) {
@@ -182,7 +259,6 @@
                             </li>
                         </ul>
                     </nav>
-                    }
                     }
                 </div>
             </div>
