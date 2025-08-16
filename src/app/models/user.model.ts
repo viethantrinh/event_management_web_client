@@ -11,3 +11,22 @@ export interface UserResponse {
   roles: RoleResponse[];
 }
 
+export interface UpdateUserRequest {
+  email: string;
+  workEmail?: string;
+  fullName: string;
+  phoneNumber: string;
+  academicRank: string;
+  academicDegree: string;
+  roleNames: string[];
+}
+
+export interface UserListParams {
+  page?: number;
+  size?: number;
+  search?: string;
+  role?: string;
+  academicRank?: string;
+  academicDegree?: string;
+}
+
