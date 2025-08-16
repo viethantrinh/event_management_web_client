@@ -1,0 +1,100 @@
+<div class="export-container">
+    <div class="row">
+        <div class="col-12">
+            <h2 class="page-title">Xuất file Excel</h2>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title mb-4">Chọn dữ liệu để xuất</h5>
+
+                    <div class="export-options">
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" id="exportUsers">
+                            <label class="form-check-label" for="exportUsers">
+                                <strong>Danh sách người dùng</strong>
+                                <small class="d-block text-muted">Xuất thông tin tất cả người dùng trong hệ
+                                    thống</small>
+                            </label>
+                        </div>
+
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" id="exportEvents">
+                            <label class="form-check-label" for="exportEvents">
+                                <strong>Danh sách sự kiện</strong>
+                                <small class="d-block text-muted">Xuất thông tin tất cả sự kiện</small>
+                            </label>
+                        </div>
+
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" id="exportAttendance">
+                            <label class="form-check-label" for="exportAttendance">
+                                <strong>Báo cáo tham dự</strong>
+                                <small class="d-block text-muted">Xuất báo cáo tham dự sự kiện</small>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="mt-4">
+                        <h6>Tùy chọn thời gian</h6>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label for="fromDate" class="form-label">Từ ngày</label>
+                                <input type="date" class="form-control" id="fromDate">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="toDate" class="form-label">Đến ngày</label>
+                                <input type="date" class="form-control" id="toDate">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-4">
+                        <button class="btn btn-success me-2">
+                            <i class="fas fa-file-excel me-2"></i>Xuất Excel
+                        </button>
+                        <button class="btn btn-outline-secondary">
+                            <i class="fas fa-eye me-2"></i>Xem trước
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-body">
+                    <h6 class="card-title">Lịch sử xuất file</h6>
+                    <div class="export-history">
+                        <div class="history-item">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <strong>Danh sách người dùng</strong>
+                                    <small class="d-block text-muted">16/08/2025 10:30</small>
+                                </div>
+                                <button class="btn btn-sm btn-outline-primary">
+                                    <i class="fas fa-download"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="history-item">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <strong>Báo cáo sự kiện</strong>
+                                    <small class="d-block text-muted">15/08/2025 14:20</small>
+                                </div>
+                                <button class="btn btn-sm btn-outline-primary">
+                                    <i class="fas fa-download"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,34 @@
+.event-list-container {
+    padding: 1.5rem;
+}
+
+.page-title {
+    color: #2c3e50;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+}
+
+.card {
+    border: none;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.event-card {
+    transition: transform 0.2s ease;
+    height: 100%;
+}
+
+.event-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.event-card .card-title {
+    font-weight: 600;
+    color: #2c3e50;
+}
+
+.event-card .card-text {
+    font-size: 0.875rem;
+    line-height: 1.6;
+}
