@@ -6,7 +6,8 @@ import { EventManagementComponent } from '../event-management/event-management.c
 import { ExportComponent } from '../export/export.component';
 import { OverviewComponent } from '../overview/overview.component';
 import { UserManagementComponent } from '../user-management/user-management.component';
-import {Router} from '@angular/router';
+import { Router } from '@angular/router';
+import { DutyManagementComponent } from "../duty-management/duty-management.component";
 
 export interface MenuItem {
   id: string;
@@ -24,8 +25,9 @@ export interface MenuItem {
     UserManagementComponent,
     EventManagementComponent,
     EventListComponent,
-    ExportComponent
-  ],
+    ExportComponent,
+    DutyManagementComponent
+],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.css'
 })
@@ -58,6 +60,12 @@ export class DashboardComponent {
       id: 'event-management',
       label: 'Quản lý sự kiện',
       icon: 'fas fa-calendar-alt',
+      roles: ['ADMIN']
+    },
+    {
+      id: 'duty-management',
+      label: 'Quản lý nhiệm vụ',
+      icon: 'fa-solid fa-person-circle-question',
       roles: ['ADMIN']
     },
     {

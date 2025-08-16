@@ -1,0 +1,358 @@
+<div class="duty-management-container">
+    <div class="row">
+        <div class="col-12">
+            <h2 class="page-title">Quản lý nhiệm vụ</h2>
+        </div>
+    </div>
+
+    <!-- Search and Actions -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="row g-3 align-items-end">
+                        <!-- Search -->
+                        <div class="col-12 col-md-8 col-lg-9">
+                            <label class="form-label">Tìm kiếm</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control" placeholder="Tên hoặc mô tả nhiệm vụ..."
+                                    #searchInput [value]="searchTerm()" (input)="onSearch(searchInput.value)">
+                                @if (searchTerm()) {
+                                <button class="btn btn-outline-secondary" type="button" (click)="clearSearch()">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                                }
+                            </div>
+                        </div>
+
+                        <!-- Create Button -->
+                        <div class="col-12 col-md-4 col-lg-3">
+                            <button type="button" class="btn btn-primary w-100" (click)="openCreateModal()">
+                                <i class="fas fa-plus me-2"></i>
+                                <span class="d-none d-sm-inline">Tạo nhiệm vụ</span>
+                                <span class="d-sm-none">Tạo</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Duties Table -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="card-title mb-0">
+                            Danh sách nhiệm vụ
+                            <span class="badge bg-primary ms-2">{{ filteredDuties().length }}</span>
+                        </h5>
+                        <button class="btn btn-success" (click)="loadDuties()" [disabled]="loading()">
+                            @if (loading()) {
+                            <span class="spinner-border spinner-border-sm me-2"></span>
+                            } @else {
+                            <i class="fas fa-sync-alt me-2"></i>
+                            }
+                            Làm mới
+                        </button>
+                    </div>
+
+                    @if (loading()) {
+                    <div class="text-center py-4">
+                        <div class="spinner-border" role="status">
+                            <span class="visually-hidden">Đang tải...</span>
+                        </div>
+                    </div>
+                    } @else if (paginatedDuties().length === 0) {
+                    <div class="text-center py-4">
+                        <i class="fas fa-tasks fa-3x text-muted mb-3"></i>
+                        <p class="text-muted">
+                            @if (searchTerm()) {
+                            Không tìm thấy nhiệm vụ phù hợp với từ khóa "{{ searchTerm() }}"
+                            } @else {
+                            Chưa có nhiệm vụ nào được tạo
+                            }
+                        </p>
+                    </div>
+                    } @else {
+
+                    <!-- Desktop Table View -->
+                    <div class="d-none d-lg-block">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th style="width: 80px;">ID</th>
+                                        <th style="width: 200px;">Tên nhiệm vụ</th>
+                                        <th>Mô tả</th>
+                                        <th style="width: 150px;" class="text-center">Thao tác</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @for (duty of paginatedDuties(); track duty.id) {
+                                    <tr>
+                                        <td class="align-middle">
+                                            <span class="badge bg-secondary">#{{ duty.id }}</span>
+                                        </td>
+                                        <td class="align-middle">
+                                            <div class="fw-bold">{{ duty.name }}</div>
+                                        </td>
+                                        <td class="align-middle">
+                                            <span class="text-muted">{{ duty.description }}</span>
+                                        </td>
+                                        <td class="text-center align-middle">
+                                            <div class="btn-group" role="group">
+                                                <button type="button" class="btn btn-sm btn-outline-primary"
+                                                    (click)="openEditModal(duty)" [disabled]="loading()"
+                                                    title="Chỉnh sửa">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                <button type="button" class="btn btn-sm btn-outline-danger"
+                                                    (click)="openDeleteModal(duty)" [disabled]="loading()" title="Xóa">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Mobile/Tablet Card View -->
+                    <div class="d-lg-none">
+                        @for (duty of paginatedDuties(); track duty.id) {
+                        <div class="card duty-card mb-3">
+                            <div class="card-body">
+                                <!-- Duty Header -->
+                                <div class="d-flex justify-content-between align-items-start mb-3">
+                                    <div class="flex-grow-1">
+                                        <div class="d-flex align-items-center mb-2">
+                                            <span class="badge bg-secondary me-2">#{{ duty.id }}</span>
+                                            <h6 class="mb-0 fw-bold">{{ duty.name }}</h6>
+                                        </div>
+                                        <p class="text-muted mb-0 small">{{ duty.description }}</p>
+                                    </div>
+                                    <div class="btn-group">
+                                        <button class="btn btn-sm btn-outline-primary me-1"
+                                            (click)="openEditModal(duty)" title="Chỉnh sửa">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-danger" (click)="openDeleteModal(duty)"
+                                            title="Xóa">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        }
+                    </div>
+
+                    }
+
+                    <!-- Pagination -->
+                    @if (totalPages() > 1) {
+                    <nav class="mt-4">
+                        <ul class="pagination justify-content-center">
+                            <li class="page-item" [class.disabled]="currentPage() === 1">
+                                <a class="page-link" href="javascript:void(0)" (click)="goToPage(currentPage() - 1)">
+                                    <i class="fas fa-chevron-left"></i>
+                                </a>
+                            </li>
+
+                            @for (page of pageNumbers(); track page) {
+                            <li class="page-item" [class.active]="currentPage() === page">
+                                <a class="page-link" href="javascript:void(0)" (click)="goToPage(page)">
+                                    {{ page }}
+                                </a>
+                            </li>
+                            }
+
+                            <li class="page-item" [class.disabled]="currentPage() === totalPages()">
+                                <a class="page-link" href="javascript:void(0)" (click)="goToPage(currentPage() + 1)">
+                                    <i class="fas fa-chevron-right"></i>
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Create Duty Modal -->
+@if (showCreateModal()) {
+<div class="modal d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-plus me-2"></i>Tạo nhiệm vụ mới
+                </h5>
+                <button type="button" class="btn-close" (click)="closeCreateModal()"></button>
+            </div>
+            <form [formGroup]="createForm" (ngSubmit)="onCreateDuty()">
+                <div class="modal-body">
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <label class="form-label">Tên nhiệm vụ *</label>
+                            <input type="text" class="form-control" formControlName="name"
+                                placeholder="Nhập tên nhiệm vụ..."
+                                [class.is-invalid]="createForm.get('name')?.touched && createForm.get('name')?.errors">
+                            @if (createForm.get('name')?.touched && createForm.get('name')?.errors) {
+                            <div class="invalid-feedback">
+                                @if (createForm.get('name')?.errors?.['required']) {
+                                Tên nhiệm vụ là bắt buộc
+                                } @else if (createForm.get('name')?.errors?.['minlength']) {
+                                Tên nhiệm vụ phải có ít nhất 2 ký tự
+                                }
+                            </div>
+                            }
+                        </div>
+
+                        <div class="col-12">
+                            <label class="form-label">Mô tả *</label>
+                            <textarea class="form-control" formControlName="description" rows="3"
+                                placeholder="Nhập mô tả nhiệm vụ..."
+                                [class.is-invalid]="createForm.get('description')?.touched && createForm.get('description')?.errors"></textarea>
+                            @if (createForm.get('description')?.touched && createForm.get('description')?.errors) {
+                            <div class="invalid-feedback">
+                                @if (createForm.get('description')?.errors?.['required']) {
+                                Mô tả là bắt buộc
+                                } @else if (createForm.get('description')?.errors?.['minlength']) {
+                                Mô tả phải có ít nhất 2 ký tự
+                                }
+                            </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" (click)="closeCreateModal()" [disabled]="loading()">
+                        Hủy
+                    </button>
+                    <button type="submit" class="btn btn-primary" [disabled]="loading() || createForm.invalid">
+                        @if (loading()) {
+                        <span class="spinner-border spinner-border-sm me-2"></span>
+                        }
+                        Tạo nhiệm vụ
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+}
+
+<!-- Edit Duty Modal -->
+@if (showEditModal() && editingDuty()) {
+<div class="modal d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-edit me-2"></i>Chỉnh sửa nhiệm vụ
+                </h5>
+                <button type="button" class="btn-close" (click)="closeEditModal()"></button>
+            </div>
+            <form [formGroup]="editForm" (ngSubmit)="onUpdateDuty()">
+                <div class="modal-body">
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <label class="form-label">ID</label>
+                            <input type="text" class="form-control" [value]="editingDuty()?.id" readonly>
+                        </div>
+
+                        <div class="col-12">
+                            <label class="form-label">Tên nhiệm vụ *</label>
+                            <input type="text" class="form-control" formControlName="name"
+                                placeholder="Nhập tên nhiệm vụ..."
+                                [class.is-invalid]="editForm.get('name')?.touched && editForm.get('name')?.errors">
+                            @if (editForm.get('name')?.touched && editForm.get('name')?.errors) {
+                            <div class="invalid-feedback">
+                                @if (editForm.get('name')?.errors?.['required']) {
+                                Tên nhiệm vụ là bắt buộc
+                                } @else if (editForm.get('name')?.errors?.['minlength']) {
+                                Tên nhiệm vụ phải có ít nhất 2 ký tự
+                                }
+                            </div>
+                            }
+                        </div>
+
+                        <div class="col-12">
+                            <label class="form-label">Mô tả *</label>
+                            <textarea class="form-control" formControlName="description" rows="3"
+                                placeholder="Nhập mô tả nhiệm vụ..."
+                                [class.is-invalid]="editForm.get('description')?.touched && editForm.get('description')?.errors"></textarea>
+                            @if (editForm.get('description')?.touched && editForm.get('description')?.errors) {
+                            <div class="invalid-feedback">
+                                @if (editForm.get('description')?.errors?.['required']) {
+                                Mô tả là bắt buộc
+                                } @else if (editForm.get('description')?.errors?.['minlength']) {
+                                Mô tả phải có ít nhất 2 ký tự
+                                }
+                            </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" (click)="closeEditModal()" [disabled]="loading()">
+                        Hủy
+                    </button>
+                    <button type="submit" class="btn btn-primary" [disabled]="loading() || editForm.invalid">
+                        @if (loading()) {
+                        <span class="spinner-border spinner-border-sm me-2"></span>
+                        }
+                        Cập nhật
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+}
+
+<!-- Delete Confirmation Modal -->
+@if (showDeleteModal() && deletingDuty()) {
+<div class="modal d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title text-danger">
+                    <i class="fas fa-exclamation-triangle me-2"></i>Xác nhận xóa
+                </h5>
+                <button type="button" class="btn-close" (click)="closeDeleteModal()"></button>
+            </div>
+            <div class="modal-body">
+                <p>Bạn có chắc chắn muốn xóa nhiệm vụ:</p>
+                <div class="alert alert-warning">
+                    <strong>{{ deletingDuty()?.name }}</strong><br>
+                    <small>{{ deletingDuty()?.description }}</small>
+                </div>
+                <p class="text-danger">
+                    <i class="fas fa-exclamation-circle me-2"></i>
+                    Hành động này không thể hoàn tác!
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" (click)="closeDeleteModal()" [disabled]="loading()">
+                    Hủy
+                </button>
+                <button type="button" class="btn btn-danger" (click)="onDeleteDuty()" [disabled]="loading()">
+                    @if (loading()) {
+                    <span class="spinner-border spinner-border-sm me-2"></span>
+                    }
+                    Xóa nhiệm vụ
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+}
