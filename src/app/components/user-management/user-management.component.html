@@ -1,436 +1,353 @@
 <div class="user-management-container">
-  <div class="row">
-    <div class="col-12">
-      <h2 class="page-title">Quản lý người dùng</h2>
-    </div>
-  </div>
-
-  <!-- Filters and Search -->
-  <div class="row mb-4">
-    <div class="col-12">
-      <div class="card">
-        <div class="card-body">
-          <div class="row g-3">
-            <!-- Search -->
-            <div class="col-md-4">
-              <label class="form-label">Tìm kiếm</label>
-              <input 
-                type="text" 
-                class="form-control" 
-                placeholder="Tên, email hoặc số điện thoại..."
-                #searchInput
-                [value]="searchTerm()"
-                (input)="onSearch(searchInput.value)"
-              >
-            </div>
-
-            <!-- Role Filter -->
-            <div class="col-md-2">
-              <label class="form-label">Vai trò</label>
-              <select 
-                #roleSelect
-                class="form-select"
-                [value]="selectedRole()"
-                (change)="onRoleFilter(roleSelect.value)"
-              >
-                <option value="">Tất cả</option>
-                @for (role of roles; track role) {
-                  <option [value]="role">{{ role }}</option>
-                }
-              </select>
-            </div>
-
-            <!-- Academic Rank Filter -->
-            <div class="col-md-2">
-              <label class="form-label">Học hàm</label>
-              <select 
-                #rankSelect
-                class="form-select"
-                [value]="selectedAcademicRank()"
-                (change)="onAcademicRankFilter(rankSelect.value)"
-              >
-                <option value="">Tất cả</option>
-                @for (rank of academicRanks; track rank) {
-                  <option [value]="rank">{{ getAcademicRankDisplay(rank) }}</option>
-                }
-              </select>
-            </div>
-
-            <!-- Academic Degree Filter -->
-            <div class="col-md-2">
-              <label class="form-label">Học vị</label>
-              <select 
-                #degreeSelect
-                class="form-select"
-                [value]="selectedAcademicDegree()"
-                (change)="onAcademicDegreeFilter(degreeSelect.value)"
-              >
-                <option value="">Tất cả</option>
-                @for (degree of academicDegrees; track degree) {
-                  <option [value]="degree">{{ getAcademicDegreeDisplay(degree) }}</option>
-                }
-              </select>
-            </div>
-
-            <!-- Clear Filters -->
-            <div class="col-md-2 d-flex align-items-end">
-              <button 
-                type="button" 
-                class="btn btn-outline-secondary w-100"
-                (click)="clearFilters()"
-              >
-                <i class="fas fa-times me-2"></i>Xóa bộ lọc
-              </button>
-            </div>
-          </div>
+    <div class="row">
+        <div class="col-12">
+            <h2 class="page-title">Quản lý người dùng</h2>
         </div>
-      </div>
     </div>
-  </div>
 
-  <!-- Users Table -->
-  <div class="row">
-    <div class="col-12">
-      <div class="card">
-        <div class="card-body">
-          <div class="d-flex justify-content-between align-items-center mb-3">
-            <h5 class="card-title mb-0">
-              Danh sách người dùng 
-              <span class="badge bg-primary ms-2">{{ filteredUsers().length }}</span>
-            </h5>
-            <button 
-              class="btn btn-success"
-              (click)="loadUsers()"
-              [disabled]="loading()"
-            >
-              @if (loading()) {
-                <span class="spinner-border spinner-border-sm me-2"></span>
-              } @else {
-                <i class="fas fa-sync-alt me-2"></i>
-              }
-              Làm mới
-            </button>
-          </div>
+    <!-- Filters and Search -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="row g-3">
+                        <!-- Search -->
+                        <div class="col-md-4">
+                            <label class="form-label">Tìm kiếm</label>
+                            <input type="text" class="form-control" placeholder="Tên, email hoặc số điện thoại..."
+                                #searchInput [value]="searchTerm()" (input)="onSearch(searchInput.value)">
+                        </div>
 
-          @if (loading()) {
-            <div class="text-center py-4">
-              <div class="spinner-border" role="status">
-                <span class="visually-hidden">Đang tải...</span>
-              </div>
+                        <!-- Role Filter -->
+                        <div class="col-md-2">
+                            <label class="form-label">Vai trò</label>
+                            <select #roleSelect class="form-select" [value]="selectedRole()"
+                                (change)="onRoleFilter(roleSelect.value)">
+                                <option value="">Tất cả</option>
+                                @for (role of roles; track role) {
+                                <option [value]="role">{{ role }}</option>
+                                }
+                            </select>
+                        </div>
+
+                        <!-- Academic Rank Filter -->
+                        <div class="col-md-2">
+                            <label class="form-label">Học hàm</label>
+                            <select #rankSelect class="form-select" [value]="selectedAcademicRank()"
+                                (change)="onAcademicRankFilter(rankSelect.value)">
+                                <option value="">Tất cả</option>
+                                @for (rank of academicRanks; track rank) {
+                                <option [value]="rank">{{ getAcademicRankDisplay(rank) }}</option>
+                                }
+                            </select>
+                        </div>
+
+                        <!-- Academic Degree Filter -->
+                        <div class="col-md-2">
+                            <label class="form-label">Học vị</label>
+                            <select #degreeSelect class="form-select" [value]="selectedAcademicDegree()"
+                                (change)="onAcademicDegreeFilter(degreeSelect.value)">
+                                <option value="">Tất cả</option>
+                                @for (degree of academicDegrees; track degree) {
+                                <option [value]="degree">{{ getAcademicDegreeDisplay(degree) }}</option>
+                                }
+                            </select>
+                        </div>
+
+                        <!-- Clear Filters -->
+                        <div class="col-md-2 d-flex align-items-end">
+                            <button type="button" class="btn btn-outline-secondary w-100" (click)="clearFilters()">
+                                <i class="fas fa-times me-2"></i>Xóa bộ lọc
+                            </button>
+                        </div>
+                    </div>
+                </div>
             </div>
-          } @else if (paginatedUsers().length === 0) {
-            <div class="text-center py-4">
-              <i class="fas fa-users fa-3x text-muted mb-3"></i>
-              <p class="text-muted">Không có người dùng nào được tìm thấy</p>
-            </div>
-          } @else {
-            <div class="table-responsive">
-              <table class="table table-hover">
-                <thead class="table-light">
-                  <tr>
-                    <th>Tên</th>
-                    <th>Email</th>
-                    <th>Số điện thoại</th>
-                    <th>Học hàm</th>
-                    <th>Học vị</th>
-                    <th>Vai trò</th>
-                    <th class="text-center">Thao tác</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  @for (user of paginatedUsers(); track user.id) {
-                    <tr>
-                      <td>
-                        <div class="d-flex align-items-center">
-                          <div class="user-avatar me-3">
-                            <i class="fas fa-user"></i>
-                          </div>
-                          <div>
-                            <div class="fw-bold">{{ user.fullName }}</div>
-                            @if (user.workEmail) {
-                              <small class="text-muted">{{ user.workEmail }}</small>
+        </div>
+    </div>
+
+    <!-- Users Table -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="card-title mb-0">
+                            Danh sách người dùng
+                            <span class="badge bg-primary ms-2">{{ filteredUsers().length }}</span>
+                        </h5>
+                        <button class="btn btn-success" (click)="loadUsers()" [disabled]="loading()">
+                            @if (loading()) {
+                            <span class="spinner-border spinner-border-sm me-2"></span>
+                            } @else {
+                            <i class="fas fa-sync-alt me-2"></i>
                             }
-                          </div>
-                        </div>
-                      </td>
-                      <td>{{ user.email }}</td>
-                      <td>{{ user.phoneNumber }}</td>
-                      <td>{{ getAcademicRankDisplay(user.academicRank) }}</td>
-                      <td>{{ getAcademicDegreeDisplay(user.academicDegree) }}</td>
-                      <td>
-                        @for (role of user.roles; track role.name) {
-                          <span 
-                            class="badge me-1"
-                            [class.bg-primary]="role.name === 'ADMIN'"
-                            [class.bg-secondary]="role.name === 'USER'"
-                          >
-                            {{ role.name }}
-                          </span>
-                        }
-                      </td>
-                      <td class="text-center">
-                        <div class="btn-group" role="group">
-                          <button 
-                            type="button" 
-                            class="btn btn-sm btn-outline-primary"
-                            (click)="openEditModal(user)"
-                            [disabled]="loading()"
-                          >
-                            <i class="fas fa-edit"></i>
-                          </button>
-                          <button 
-                            type="button" 
-                            class="btn btn-sm btn-outline-danger"
-                            (click)="openDeleteModal(user)"
-                            [disabled]="loading()"
-                          >
-                            <i class="fas fa-trash"></i>
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  }
-                </tbody>
-              </table>
-            </div>
+                            Làm mới
+                        </button>
+                    </div>
 
-            <!-- Pagination -->
-            @if (totalPages() > 1) {
-              <nav class="mt-4">
-                <ul class="pagination justify-content-center">
-                  <li class="page-item" [class.disabled]="currentPage() === 1">
-                    <a class="page-link" href="javascript:void(0)" (click)="goToPage(currentPage() - 1)">
-                      <i class="fas fa-chevron-left"></i>
-                    </a>
-                  </li>
-                  
-                  @for (page of pageNumbers(); track page) {
-                    <li class="page-item" [class.active]="currentPage() === page">
-                      <a class="page-link" href="javascript:void(0)" (click)="goToPage(page)">
-                        {{ page }}
-                      </a>
-                    </li>
-                  }
-                  
-                  <li class="page-item" [class.disabled]="currentPage() === totalPages()">
-                    <a class="page-link" href="javascript:void(0)" (click)="goToPage(currentPage() + 1)">
-                      <i class="fas fa-chevron-right"></i>
-                    </a>
-                  </li>
-                </ul>
-              </nav>
-            }
-          }
+                    @if (loading()) {
+                    <div class="text-center py-4">
+                        <div class="spinner-border" role="status">
+                            <span class="visually-hidden">Đang tải...</span>
+                        </div>
+                    </div>
+                    } @else if (paginatedUsers().length === 0) {
+                    <div class="text-center py-4">
+                        <i class="fas fa-users fa-3x text-muted mb-3"></i>
+                        <p class="text-muted">Không có người dùng nào được tìm thấy</p>
+                    </div>
+                    } @else {
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Tên</th>
+                                    <th>Email</th>
+                                    <th>Số điện thoại</th>
+                                    <th>Học hàm</th>
+                                    <th>Học vị</th>
+                                    <th>Vai trò</th>
+                                    <th class="text-center">Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @for (user of paginatedUsers(); track user.id) {
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="user-avatar me-3">
+                                                <i class="fas fa-user"></i>
+                                            </div>
+                                            <div>
+                                                <div class="fw-bold">{{ user.fullName }}</div>
+                                                @if (user.workEmail) {
+                                                <small class="text-muted">{{ user.workEmail }}</small>
+                                                }
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>{{ user.email }}</td>
+                                    <td>{{ user.phoneNumber }}</td>
+                                    <td>{{ getAcademicRankDisplay(user.academicRank) }}</td>
+                                    <td>{{ getAcademicDegreeDisplay(user.academicDegree) }}</td>
+                                    <td>
+                                        @for (role of user.roles; track role.name) {
+                                        <span class="badge me-1" [class.bg-primary]="role.name === 'ADMIN'"
+                                            [class.bg-secondary]="role.name === 'USER'">
+                                            {{ role.name }}
+                                        </span>
+                                        }
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="btn-group" role="group">
+                                            <button type="button" class="btn btn-sm btn-outline-primary"
+                                                (click)="openEditModal(user)" [disabled]="loading()">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button type="button" class="btn btn-sm btn-outline-danger"
+                                                (click)="openDeleteModal(user)" [disabled]="loading()">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Pagination -->
+                    @if (totalPages() > 1) {
+                    <nav class="mt-4">
+                        <ul class="pagination justify-content-center">
+                            <li class="page-item" [class.disabled]="currentPage() === 1">
+                                <a class="page-link" href="javascript:void(0)" (click)="goToPage(currentPage() - 1)">
+                                    <i class="fas fa-chevron-left"></i>
+                                </a>
+                            </li>
+
+                            @for (page of pageNumbers(); track page) {
+                            <li class="page-item" [class.active]="currentPage() === page">
+                                <a class="page-link" href="javascript:void(0)" (click)="goToPage(page)">
+                                    {{ page }}
+                                </a>
+                            </li>
+                            }
+
+                            <li class="page-item" [class.disabled]="currentPage() === totalPages()">
+                                <a class="page-link" href="javascript:void(0)" (click)="goToPage(currentPage() + 1)">
+                                    <i class="fas fa-chevron-right"></i>
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
+                    }
+                    }
+                </div>
+            </div>
         </div>
-      </div>
     </div>
-  </div>
 </div>
 
 <!-- Edit User Modal -->
 @if (showEditModal()) {
-  <div class="modal d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
+<div class="modal d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
     <div class="modal-dialog modal-lg">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">
-            <i class="fas fa-edit me-2"></i>Chỉnh sửa người dùng
-          </h5>
-          <button type="button" class="btn-close" (click)="closeEditModal()"></button>
-        </div>
-        <form [formGroup]="editForm" (ngSubmit)="onUpdateUser()">
-          <div class="modal-body">
-            <div class="row g-3">
-              <div class="col-md-6">
-                <label class="form-label">Email *</label>
-                <input 
-                  type="email" 
-                  class="form-control" 
-                  formControlName="email"
-                  [class.is-invalid]="editForm.get('email')?.touched && editForm.get('email')?.errors"
-                >
-                @if (editForm.get('email')?.touched && editForm.get('email')?.errors) {
-                  <div class="invalid-feedback">
-                    Email không hợp lệ
-                  </div>
-                }
-              </div>
-              
-              <div class="col-md-6">
-                <label class="form-label">Email công việc</label>
-                <input 
-                  type="email" 
-                  class="form-control" 
-                  formControlName="workEmail"
-                  [class.is-invalid]="editForm.get('workEmail')?.touched && editForm.get('workEmail')?.errors"
-                >
-              </div>
-
-              <div class="col-md-6">
-                <label class="form-label">Họ và tên *</label>
-                <input 
-                  type="text" 
-                  class="form-control" 
-                  formControlName="fullName"
-                  [class.is-invalid]="editForm.get('fullName')?.touched && editForm.get('fullName')?.errors"
-                >
-                @if (editForm.get('fullName')?.touched && editForm.get('fullName')?.errors) {
-                  <div class="invalid-feedback">
-                    Họ tên là bắt buộc
-                  </div>
-                }
-              </div>
-
-              <div class="col-md-6">
-                <label class="form-label">Số điện thoại *</label>
-                <input 
-                  type="text" 
-                  class="form-control" 
-                  formControlName="phoneNumber"
-                  [class.is-invalid]="editForm.get('phoneNumber')?.touched && editForm.get('phoneNumber')?.errors"
-                >
-                @if (editForm.get('phoneNumber')?.touched && editForm.get('phoneNumber')?.errors) {
-                  <div class="invalid-feedback">
-                    Số điện thoại là bắt buộc
-                  </div>
-                }
-              </div>
-
-              <div class="col-md-6">
-                <label class="form-label">Học hàm *</label>
-                <select 
-                  class="form-select" 
-                  formControlName="academicRank"
-                  [class.is-invalid]="editForm.get('academicRank')?.touched && editForm.get('academicRank')?.errors"
-                >
-                  <option value="">Chọn học hàm</option>
-                  @for (rank of academicRanks; track rank) {
-                    <option [value]="rank">{{ getAcademicRankDisplay(rank) }}</option>
-                  }
-                </select>
-                @if (editForm.get('academicRank')?.touched && editForm.get('academicRank')?.errors) {
-                  <div class="invalid-feedback">
-                    Học hàm là bắt buộc
-                  </div>
-                }
-              </div>
-
-              <div class="col-md-6">
-                <label class="form-label">Học vị *</label>
-                <select 
-                  class="form-select" 
-                  formControlName="academicDegree"
-                  [class.is-invalid]="editForm.get('academicDegree')?.touched && editForm.get('academicDegree')?.errors"
-                >
-                  <option value="">Chọn học vị</option>
-                  @for (degree of academicDegrees; track degree) {
-                    <option [value]="degree">{{ getAcademicDegreeDisplay(degree) }}</option>
-                  }
-                </select>
-                @if (editForm.get('academicDegree')?.touched && editForm.get('academicDegree')?.errors) {
-                  <div class="invalid-feedback">
-                    Học vị là bắt buộc
-                  </div>
-                }
-              </div>
-
-              <div class="col-12">
-                <label class="form-label">Vai trò *</label>
-                <div class="role-checkboxes">
-                  @for (role of roles; track role) {
-                    <div class="form-check form-check-inline">
-                      <input 
-                        class="form-check-input" 
-                        type="checkbox" 
-                        [id]="'role-' + role"
-                        [value]="role"
-                        [checked]="editForm.get('roleNames')?.value?.includes(role)"
-                        (change)="onRoleChange(role, $event)"
-                      >
-                      <label class="form-check-label" [for]="'role-' + role">
-                        {{ role }}
-                      </label>
-                    </div>
-                  }
-                </div>
-                @if (editForm.get('roleNames')?.touched && editForm.get('roleNames')?.errors) {
-                  <div class="text-danger small">
-                    Ít nhất một vai trò phải được chọn
-                  </div>
-                }
-              </div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-edit me-2"></i>Chỉnh sửa người dùng
+                </h5>
+                <button type="button" class="btn-close" (click)="closeEditModal()"></button>
             </div>
-          </div>
-          <div class="modal-footer">
-            <button 
-              type="button" 
-              class="btn btn-secondary" 
-              (click)="closeEditModal()"
-              [disabled]="loading()"
-            >
-              Hủy
-            </button>
-            <button 
-              type="submit" 
-              class="btn btn-primary"
-              [disabled]="loading() || editForm.invalid"
-            >
-              @if (loading()) {
-                <span class="spinner-border spinner-border-sm me-2"></span>
-              }
-              Cập nhật
-            </button>
-          </div>
-        </form>
-      </div>
+            <form [formGroup]="editForm" (ngSubmit)="onUpdateUser()">
+                <div class="modal-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Email *</label>
+                            <input type="email" class="form-control" formControlName="email"
+                                [class.is-invalid]="editForm.get('email')?.touched && editForm.get('email')?.errors">
+                            @if (editForm.get('email')?.touched && editForm.get('email')?.errors) {
+                            <div class="invalid-feedback">
+                                Email không hợp lệ
+                            </div>
+                            }
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Email công việc</label>
+                            <input type="email" class="form-control" formControlName="workEmail"
+                                [class.is-invalid]="editForm.get('workEmail')?.touched && editForm.get('workEmail')?.errors">
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Họ và tên *</label>
+                            <input type="text" class="form-control" formControlName="fullName"
+                                [class.is-invalid]="editForm.get('fullName')?.touched && editForm.get('fullName')?.errors">
+                            @if (editForm.get('fullName')?.touched && editForm.get('fullName')?.errors) {
+                            <div class="invalid-feedback">
+                                Họ tên là bắt buộc
+                            </div>
+                            }
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Số điện thoại *</label>
+                            <input type="text" class="form-control" formControlName="phoneNumber"
+                                [class.is-invalid]="editForm.get('phoneNumber')?.touched && editForm.get('phoneNumber')?.errors">
+                            @if (editForm.get('phoneNumber')?.touched && editForm.get('phoneNumber')?.errors) {
+                            <div class="invalid-feedback">
+                                Số điện thoại là bắt buộc
+                            </div>
+                            }
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Học hàm *</label>
+                            <select class="form-select" formControlName="academicRank"
+                                [class.is-invalid]="editForm.get('academicRank')?.touched && editForm.get('academicRank')?.errors">
+                                <option value="">Chọn học hàm</option>
+                                @for (rank of academicRanks; track rank) {
+                                <option [value]="rank">{{ getAcademicRankDisplay(rank) }}</option>
+                                }
+                            </select>
+                            @if (editForm.get('academicRank')?.touched && editForm.get('academicRank')?.errors) {
+                            <div class="invalid-feedback">
+                                Học hàm là bắt buộc
+                            </div>
+                            }
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Học vị *</label>
+                            <select class="form-select" formControlName="academicDegree"
+                                [class.is-invalid]="editForm.get('academicDegree')?.touched && editForm.get('academicDegree')?.errors">
+                                <option value="">Chọn học vị</option>
+                                @for (degree of academicDegrees; track degree) {
+                                <option [value]="degree">{{ getAcademicDegreeDisplay(degree) }}</option>
+                                }
+                            </select>
+                            @if (editForm.get('academicDegree')?.touched && editForm.get('academicDegree')?.errors) {
+                            <div class="invalid-feedback">
+                                Học vị là bắt buộc
+                            </div>
+                            }
+                        </div>
+
+                        <div class="col-12">
+                            <label class="form-label">Vai trò *</label>
+                            <div class="role-checkboxes">
+                                @for (role of roles; track role) {
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="checkbox" [id]="'role-' + role" [value]="role"
+                                        [checked]="editForm.get('roleNames')?.value?.includes(role)"
+                                        (change)="onRoleChange(role, $event)">
+                                    <label class="form-check-label" [for]="'role-' + role">
+                                        {{ role }}
+                                    </label>
+                                </div>
+                                }
+                            </div>
+                            @if (editForm.get('roleNames')?.touched && editForm.get('roleNames')?.errors) {
+                            <div class="text-danger small">
+                                Ít nhất một vai trò phải được chọn
+                            </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" (click)="closeEditModal()" [disabled]="loading()">
+                        Hủy
+                    </button>
+                    <button type="submit" class="btn btn-primary" [disabled]="loading() || editForm.invalid">
+                        @if (loading()) {
+                        <span class="spinner-border spinner-border-sm me-2"></span>
+                        }
+                        Cập nhật
+                    </button>
+                </div>
+            </form>
+        </div>
     </div>
-  </div>
+</div>
 }
 
 <!-- Delete Confirmation Modal -->
 @if (showDeleteModal() && deletingUser()) {
-  <div class="modal d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
+<div class="modal d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
     <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title text-danger">
-            <i class="fas fa-exclamation-triangle me-2"></i>Xác nhận xóa
-          </h5>
-          <button type="button" class="btn-close" (click)="closeDeleteModal()"></button>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title text-danger">
+                    <i class="fas fa-exclamation-triangle me-2"></i>Xác nhận xóa
+                </h5>
+                <button type="button" class="btn-close" (click)="closeDeleteModal()"></button>
+            </div>
+            <div class="modal-body">
+                <p>Bạn có chắc chắn muốn xóa người dùng:</p>
+                <div class="alert alert-warning">
+                    <strong>{{ deletingUser()?.fullName }}</strong><br>
+                    <small>{{ deletingUser()?.email }}</small>
+                </div>
+                <p class="text-danger">
+                    <i class="fas fa-exclamation-circle me-2"></i>
+                    Hành động này không thể hoàn tác!
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" (click)="closeDeleteModal()" [disabled]="loading()">
+                    Hủy
+                </button>
+                <button type="button" class="btn btn-danger" (click)="onDeleteUser()" [disabled]="loading()">
+                    @if (loading()) {
+                    <span class="spinner-border spinner-border-sm me-2"></span>
+                    }
+                    Xóa người dùng
+                </button>
+            </div>
         </div>
-        <div class="modal-body">
-          <p>Bạn có chắc chắn muốn xóa người dùng:</p>
-          <div class="alert alert-warning">
-            <strong>{{ deletingUser()?.fullName }}</strong><br>
-            <small>{{ deletingUser()?.email }}</small>
-          </div>
-          <p class="text-danger">
-            <i class="fas fa-exclamation-circle me-2"></i>
-            Hành động này không thể hoàn tác!
-          </p>
-        </div>
-        <div class="modal-footer">
-          <button 
-            type="button" 
-            class="btn btn-secondary" 
-            (click)="closeDeleteModal()"
-            [disabled]="loading()"
-          >
-            Hủy
-          </button>
-          <button 
-            type="button" 
-            class="btn btn-danger"
-            (click)="onDeleteUser()"
-            [disabled]="loading()"
-          >
-            @if (loading()) {
-              <span class="spinner-border spinner-border-sm me-2"></span>
-            }
-            Xóa người dùng
-          </button>
-        </div>
-      </div>
     </div>
-  </div>
+</div>
 }

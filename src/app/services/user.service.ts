@@ -1,9 +1,9 @@
-import {inject, Injectable} from '@angular/core';
-import {BASE_API_URL} from '../utils/app.constants';
-import {map, Observable, tap} from 'rxjs';
-import {UserResponse, UpdateUserRequest} from '../models/user.model';
-import {HttpClient} from '@angular/common/http';
-import {ApiResponse} from '../models/base.model';
+import { HttpClient } from '@angular/common/http';
+import { inject, Injectable } from '@angular/core';
+import { map, Observable } from 'rxjs';
+import { ApiResponse } from '../models/base.model';
+import { UpdateUserRequest, UserResponse } from '../models/user.model';
+import { BASE_API_URL } from '../utils/app.constants';
 
 @Injectable({
   providedIn: 'root'

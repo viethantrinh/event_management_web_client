@@ -1,4 +1,4 @@
-import {RoleResponse} from './role.model';
+import { RoleResponse } from './role.model';
 
 export interface UserResponse {
   id: string;
