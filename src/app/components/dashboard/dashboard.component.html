@@ -1,115 +1,115 @@
 <div class="dashboard-container">
-    <!-- Sidebar -->
-    <div class="sidebar" [class.collapsed]="sidebarCollapsed()">
-        <!-- Logo Section -->
-        <div class="sidebar-header">
-            @if (!sidebarCollapsed()) {
-            <h5 class="sidebar-title">Event Manager</h5>
-            } @else {
-            <i class="fas fa-calendar-alt sidebar-logo-icon"></i>
-            }
-        </div>
+  <!-- Sidebar -->
+  <div class="sidebar" [class.collapsed]="sidebarCollapsed()">
+    <!-- Logo Section -->
+    <div class="sidebar-header">
+      @if (!sidebarCollapsed()) {
+        <h5 class="sidebar-title">Event Manager</h5>
+      } @else {
+        <i class="fas fa-calendar-alt sidebar-logo-icon"></i>
+      }
+    </div>
 
-        <!-- Navigation Menu -->
-        <nav class="sidebar-nav">
-            <ul class="nav flex-column">
-                @for (item of visibleMenuItems(); track item.id) {
-                <li class="nav-item">
-                    <a class="nav-link" [class.active]="activeMenuItem() === item.id" (click)="selectMenuItem(item.id)"
-                        href="javascript:void(0)">
-                        <i [class]="item.icon"></i>
-                        @if (!sidebarCollapsed()) {
-                        <span class="nav-text">{{ item.label }}</span>
-                        }
-                    </a>
-                </li>
+    <!-- Navigation Menu -->
+    <nav class="sidebar-nav">
+      <ul class="nav flex-column">
+        @for (item of visibleMenuItems(); track item.id) {
+          <li class="nav-item">
+            <a class="nav-link" [class.active]="activeMenuItem() === item.id" (click)="selectMenuItem(item.id)"
+               href="javascript:void(0)">
+              <i [class]="item.icon"></i>
+              @if (!sidebarCollapsed()) {
+                <span class="nav-text">{{ item.label }}</span>
+              }
+            </a>
+          </li>
+        }
+      </ul>
+    </nav>
+
+    <!-- User Section -->
+    <div class="sidebar-user">
+      @if (currentUser(); as user) {
+        @if (!sidebarCollapsed()) {
+          <div class="user-info">
+            <div class="user-avatar">
+              <i class="fas fa-user"></i>
+            </div>
+            <div class="user-details">
+              <div class="user-name">{{ user.fullName }}</div>
+              <div class="user-role">
+                @if (isAdmin()) {
+                  <span class="badge bg-primary">ADMIN</span>
+                } @else {
+                  <span class="badge bg-secondary">USER</span>
                 }
-            </ul>
-        </nav>
-
-        <!-- User Section -->
-        <div class="sidebar-user">
-            @if (currentUser(); as user) {
-            @if (!sidebarCollapsed()) {
-            <div class="user-info">
-                <div class="user-avatar">
-                    <i class="fas fa-user"></i>
-                </div>
-                <div class="user-details">
-                    <div class="user-name">{{ user.fullName }}</div>
-                    <div class="user-role">
-                        @if (isAdmin()) {
-                        <span class="badge bg-primary">ADMIN</span>
-                        } @else {
-                        <span class="badge bg-secondary">USER</span>
-                        }
-                    </div>
-                </div>
-                <button class="btn btn-link btn-sm logout-btn" (click)="logout()">
-                    <i class="fas fa-sign-out-alt"></i>
-                </button>
+              </div>
             </div>
-            } @else {
-            <div class="user-info-collapsed">
-                <div class="user-avatar">
-                    <i class="fas fa-user"></i>
-                </div>
-                <button class="btn btn-link btn-sm logout-btn-collapsed" (click)="logout()">
-                    <i class="fas fa-sign-out-alt"></i>
-                </button>
-            </div>
-            }
-            }
-        </div>
-    </div>
-
-    <!-- Main Content -->
-    <div class="main-content" [class.expanded]="sidebarCollapsed()">
-        <!-- Top Bar -->
-        <div class="top-bar">
-            <button class="btn btn-link sidebar-toggle" (click)="toggleSidebar()">
-                <i class="fas fa-bars"></i>
+            <button class="btn btn-link btn-sm logout-btn" (click)="logout()">
+              <i class="fas fa-sign-out-alt"></i>
             </button>
-
-            <div class="top-bar-actions">
-                <button class="btn btn-link">
-                    <i class="fas fa-bell"></i>
-                    <span class="badge bg-danger notification-badge">3</span>
-                </button>
+          </div>
+        } @else {
+          <div class="user-info-collapsed">
+            <div class="user-avatar">
+              <i class="fas fa-user"></i>
             </div>
-        </div>
+            <button class="btn btn-link btn-sm logout-btn-collapsed" (click)="logout()">
+              <i class="fas fa-sign-out-alt"></i>
+            </button>
+          </div>
+        }
+      }
+    </div>
+  </div>
 
-        <!-- Page Content -->
-        <div class="page-content">
-            @switch (activeMenuItem()) {
-            @case ('overview') {
-            <app-overview></app-overview>
-            }
-            @case ('user-management') {
-            <app-user-management></app-user-management>
-            }
-            @case ('event-management') {
-            <app-event-management></app-event-management>
-            }
-            @case ('event-list') {
-            <app-event-list></app-event-list>
-            }
-            @case ('export') {
-            <app-export></app-export>
-            }
-            @default {
-            @if (isAdmin()) {
-            <app-overview></app-overview>
-            } @else {
-            <app-event-list></app-event-list>
-            }
-            }
-            }
-        </div>
+  <!-- Main Content -->
+  <div class="main-content" [class.expanded]="sidebarCollapsed()">
+    <!-- Top Bar -->
+    <div class="top-bar">
+      <button class="btn btn-link sidebar-toggle" (click)="toggleSidebar()">
+        <i class="fas fa-bars"></i>
+      </button>
+
+      <div class="top-bar-actions">
+        <button class="btn btn-link">
+          <i class="fas fa-bell"></i>
+          <span class="badge bg-danger notification-badge">3</span>
+        </button>
+      </div>
     </div>
 
-    <!-- Mobile Overlay -->
-    @if (!sidebarCollapsed()) {
+    <!-- Page Content -->
+    <div class="page-content">
+      @switch (activeMenuItem()) {
+        @case ('overview') {
+          <app-overview></app-overview>
+        }
+        @case ('user-management') {
+          <app-user-management></app-user-management>
+        }
+        @case ('event-management') {
+          <app-event-management></app-event-management>
+        }
+        @case ('event-list') {
+          <app-event-list></app-event-list>
+        }
+        @case ('export') {
+          <app-export></app-export>
+        }
+        @default {
+          @if (isAdmin()) {
+            <app-overview></app-overview>
+          } @else {
+            <app-event-list></app-event-list>
+          }
+        }
+      }
+    </div>
+  </div>
+
+  <!-- Mobile Overlay -->
+  @if (!sidebarCollapsed()) {
     <div class="mobile-overlay d-lg-none" (click)="toggleSidebar()"></div>
-    }
+  }
 </div>

@@ -1,11 +1,12 @@
 import { CommonModule } from '@angular/common';
 import { Component, computed, effect, inject, signal } from '@angular/core';
 import { AuthService } from '../../services/auth.service';
-import { EventListComponent } from './pages/event-list/event-list.component';
-import { EventManagementComponent } from './pages/event-management/event-management.component';
-import { ExportComponent } from './pages/export/export.component';
-import { OverviewComponent } from './pages/overview/overview.component';
-import { UserManagementComponent } from './pages/user-management/user-management.component';
+import { EventListComponent } from '../event-list/event-list.component';
+import { EventManagementComponent } from '../event-management/event-management.component';
+import { ExportComponent } from '../export/export.component';
+import { OverviewComponent } from '../overview/overview.component';
+import { UserManagementComponent } from '../user-management/user-management.component';
+import {Router} from '@angular/router';
 
 export interface MenuItem {
   id: string;
@@ -29,7 +30,10 @@ export interface MenuItem {
   styleUrl: './dashboard.component.css'
 })
 export class DashboardComponent {
+
+  // dependencies
   private readonly authService = inject(AuthService);
+  private readonly router = inject(Router);
 
   // Signals
   public currentUser = this.authService.currentUser;
@@ -66,7 +70,7 @@ export class DashboardComponent {
       id: 'export',
       label: 'Xuất file Excel',
       icon: 'fas fa-file-excel',
-      roles: ['USER', 'ADMIN']
+      roles: ['ADMIN']
     }
   ];
 
@@ -113,5 +117,7 @@ export class DashboardComponent {
   public logout(): void {
     // Implement logout logic here
     console.log('Logout clicked');
+    this.authService.signOutApi();
+    this.router.navigate(['/auth'])
   }
 }

@@ -21,6 +21,7 @@ export class AuthService {
   private readonly baseAuthUrl = `${BASE_API_URL}/auth`;
   private readonly signInUrl = this.baseAuthUrl + '/sign-in';
   private readonly signUpUrl = this.baseAuthUrl + '/sign-up';
+  private readonly signOutUrl = this.baseAuthUrl + '/sign-out';
   private readonly introspectTokenUrl = this.baseAuthUrl + '/introspect-token';
 
   // dependencies
@@ -64,6 +65,13 @@ export class AuthService {
       );
   }
 
+  public signOutApi() {
+    const token = this.retrieveToken();
+    localStorage.clear();
+    this.currentUserSignal.set(null);
+    this.http.post<ApiResponse<null>>(this.signOutUrl, {token: token}).subscribe()
+  }
+
   public introspectTokenApi(request?: IntrospectTokenRequest): Observable<boolean> {
     const tokenToCheck = request?.token || this.retrieveToken();
 
@@ -74,7 +82,7 @@ export class AuthService {
     request = {token: tokenToCheck}
     return this.http.post<ApiResponse<IntrospectTokenResponse>>(this.introspectTokenUrl, request)
       .pipe(
-        map(response => response.result?.valid??false),
+        map(response => response.result?.valid ?? false),
         catchError(err => {
           console.error('Error when introspect token:', err);
           this.clearToken();
