@@ -1,24 +1,422 @@
-.event-management-container {
-    padding: 1.5rem;
+/* General styles */
+/* .container-fluid {
+    max-width: 1500px;
+} */
+
+/* Mobile-first responsive design */
+.text-gray-800 {
+    color: #374151 !important;
 }
 
-.page-title {
-    color: #2c3e50;
-    font-weight: 600;
-    margin-bottom: 1.5rem;
+/* Card hover effects */
+.card-hover:hover {
+    background-color: #f8f9fa;
+    transform: translateY(-1px);
+    transition: all 0.2s ease-in-out;
 }
 
-.card {
-    border: none;
+/* Mobile responsive adjustments */
+@media (max-width: 767.98px) {
+    .container-fluid {
+        padding: 1rem !important;
+    }
+
+    .h3 {
+        font-size: 1.5rem;
+    }
+
+    .card {
+        margin-bottom: 1rem;
+    }
+
+    .btn {
+        font-size: 0.875rem;
+    }
+
+    .btn-sm {
+        font-size: 0.75rem;
+        padding: 0.25rem 0.5rem;
+    }
+
+    /* Stacked buttons on mobile */
+    .d-flex.gap-2 {
+        flex-direction: column;
+        gap: 0.5rem !important;
+    }
+
+    .d-flex.gap-2>.btn {
+        width: 100%;
+    }
+
+    /* Form adjustments */
+    .form-label {
+        font-size: 0.875rem;
+        font-weight: 600;
+    }
+
+    .form-control {
+        font-size: 0.875rem;
+    }
+
+    /* Modal adjustments */
+    .modal-dialog {
+        margin: 0.5rem;
+    }
+
+    .modal-lg {
+        max-width: none;
+        width: calc(100% - 1rem);
+    }
+
+    /* Card adjustments for mobile */
+    .card-body {
+        padding: 1rem;
+    }
+
+    .card-header {
+        padding: 0.75rem 1rem;
+    }
+
+    /* Assignment cards on mobile */
+    .assignment-card {
+        border: 1px solid #dee2e6;
+        border-radius: 0.375rem;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        background-color: #fff;
+    }
+
+    /* Alert adjustments */
+    .alert {
+        padding: 0.75rem;
+        font-size: 0.875rem;
+    }
+
+    /* Badge adjustments */
+    .badge {
+        font-size: 0.75rem;
+    }
+
+    /* Table responsive on mobile - hide and show specific columns */
+    .table td,
+    .table th {
+        padding: 0.5rem;
+        font-size: 0.875rem;
+    }
+}
+
+/* Tablet adjustments */
+@media (min-width: 768px) and (max-width: 991.98px) {
+    .container-fluid {
+        padding: 2rem;
+    }
+
+    .card-body {
+        padding: 1.5rem;
+    }
+
+    .btn {
+        font-size: 0.9rem;
+    }
+}
+
+/* Desktop adjustments */
+@media (min-width: 992px) {
+    .container-fluid {
+        padding: 2rem 3rem;
+    }
+
+    .card {
+        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    }
+
+    .card:hover {
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+        transition: box-shadow 0.15s ease-in-out;
+    }
+}
+
+/* Large desktop adjustments */
+@media (min-width: 1200px) {
+    .container-fluid {
+        padding: 3rem 4rem;
+    }
+}
+
+/* Loading spinner */
+.spinner-border-sm {
+    width: 1rem;
+    height: 1rem;
+}
+
+/* Custom spacing utilities */
+.gap-2 {
+    gap: 0.5rem !important;
+}
+
+.gap-3 {
+    gap: 1rem !important;
+}
+
+/* Form validation styles */
+.form-control:invalid {
+    border-color: #dc3545;
+}
+
+.form-control:valid {
+    border-color: #198754;
+}
+
+/* Button disabled state */
+.btn:disabled,
+.btn.disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* Custom scroll for modals on mobile */
+@media (max-width: 767.98px) {
+    .modal-body {
+        max-height: 60vh;
+        overflow-y: auto;
+    }
+}
+
+/* Assignment summary cards */
+.assignment-summary .card {
+    transition: all 0.2s ease-in-out;
+}
+
+.assignment-summary .card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+}
+
+/* Icon spacing */
+.fas,
+.far {
+    margin-right: 0.25rem;
+}
+
+/* Status badges */
+.badge.bg-success {
+    background-color: #198754 !important;
+}
+
+.badge.bg-secondary {
+    background-color: #6c757d !important;
+}
+
+.badge.bg-primary {
+    background-color: #0d6efd !important;
+}
+
+/* Custom button colors */
+.btn-warning {
+    --bs-btn-color: #000;
+    --bs-btn-bg: #ffc107;
+    --bs-btn-border-color: #ffc107;
+    --bs-btn-hover-color: #000;
+    --bs-btn-hover-bg: #ffca2c;
+    --bs-btn-hover-border-color: #ffc720;
+}
+
+/* Modal backdrop */
+.modal.show {
+    backdrop-filter: blur(2px);
+}
+
+/* Touch-friendly targets on mobile */
+@media (max-width: 767.98px) {
+
+    .btn,
+    .form-control,
+    .form-select {
+        min-height: 44px;
+    }
+
+    .btn-sm {
+        min-height: 38px;
+    }
+
+    .btn-close {
+        width: 1.5rem;
+        height: 1.5rem;
+    }
+}
+
+/* Utility classes for responsive design */
+.text-sm {
+    font-size: 0.875rem;
+}
+
+.fw-medium {
+    font-weight: 500;
+}
+
+.opacity-50 {
+    opacity: 0.5;
+}
+
+/* Custom form styling */
+.form-control:focus,
+.form-select:focus {
+    border-color: #86b7fe;
+    outline: 0;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+}
+
+/* Empty state styling */
+.empty-state {
+    padding: 3rem 1rem;
+    text-align: center;
+    color: #6c757d;
+}
+
+.empty-state i {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    opacity: 0.5;
+}
+
+/* Event card styling */
+.event-card {
+    border: 1px solid #e9ecef;
+    border-radius: 0.5rem;
+    transition: all 0.3s ease;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.table th {
-    font-weight: 600;
-    color: #2c3e50;
-    border-bottom: 2px solid #dee2e6;
+.event-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    border-color: #007bff;
 }
 
-.btn-sm {
-    padding: 0.25rem 0.5rem;
+.event-card .card-body {
+    padding: 1.25rem;
+}
+
+.event-card .badge {
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+.event-card h6 {
+    color: #2c3e50;
+    font-weight: 600;
+    line-height: 1.4;
+}
+
+.event-card .text-muted {
+    color: #6c757d !important;
+    font-size: 0.9rem;
+    line-height: 1.5;
+}
+
+.event-card .btn-group .btn {
+    border-radius: 0.375rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.event-card .btn-outline-primary:hover {
+    background-color: #007bff;
+    border-color: #007bff;
+    color: white;
+}
+
+.event-card .btn-outline-danger:hover {
+    background-color: #dc3545;
+    border-color: #dc3545;
+    color: white;
+}
+
+/* Table improvements */
+.table th {
+    background-color: #f8f9fa;
+    border-top: none;
+    font-weight: 600;
+    color: #495057;
+    font-size: 0.875rem;
+    padding: 1rem 0.75rem;
+}
+
+.table td {
+    padding: 1rem 0.75rem;
+    vertical-align: middle;
+    border-top: 1px solid #e9ecef;
+}
+
+.table tbody tr:hover {
+    background-color: #f8f9fa;
+}
+
+.table .badge {
+    font-size: 0.75rem;
+    padding: 0.35rem 0.65rem;
+}
+
+.table .btn-group .btn {
+    margin: 0 2px;
+    border-radius: 0.375rem;
+}
+
+/* Card title styling */
+.card-title {
+    color: #2c3e50;
+    font-weight: 600;
+    font-size: 1.1rem;
+}
+
+.card-title .badge {
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+/* Refresh button styling */
+.btn-success {
+    background-color: #28a745;
+    border-color: #28a745;
+    font-weight: 500;
+}
+
+.btn-success:hover {
+    background-color: #218838;
+    border-color: #1e7e34;
+}
+
+/* Pagination improvements */
+.pagination .page-link {
+    border-radius: 0.375rem !important;
+    margin: 0 2px;
+    border: 1px solid #dee2e6;
+    color: #495057;
+    font-weight: 500;
+}
+
+.pagination .page-item.active .page-link {
+    background-color: #007bff;
+    border-color: #007bff;
+}
+
+.pagination .page-link:hover {
+    background-color: #e9ecef;
+    border-color: #adb5bd;
+    color: #495057;
+}
+
+/* Loading spinner improvements */
+.spinner-border-sm {
+    width: 1rem;
+    height: 1rem;
+}
+
+/* Icons styling */
+.fas {
+    color: inherit;
+}
+
+.text-muted .fas {
+    color: #6c757d !important;
 }

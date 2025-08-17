@@ -1,75 +1,636 @@
-<div class="event-management-container">
-    <div class="row">
-        <div class="col-12">
-            <h2 class="page-title">Quản lý sự kiện</h2>
+<!-- Main Container -->
+<div class="container-fluid p-4">
+    <!-- List View -->
+    @if (currentView() === 'list') {
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3 mb-0 text-gray-800">
+            <i class="fas fa-calendar-alt me-2 text-primary"></i>
+            Quản lý Sự kiện
+        </h1>
+        <button type="button" class="btn btn-primary" (click)="handleCreateEvent()" [disabled]="loading()">
+            <i class="fas fa-plus me-2"></i>
+            Tạo sự kiện
+        </button>
+    </div>
+
+    <!-- Filters and Search -->
+    <div class="card shadow mb-4">
+        <div class="card-body">
+            <div class="row g-3 align-items-end">
+                <!-- Search Input -->
+                <div class="col-md-6 col-lg-4">
+                    <label for="searchInput" class="form-label">
+                        <i class="fas fa-search me-1"></i>
+                        Tìm kiếm
+                    </label>
+                    <input type="text" id="searchInput" class="form-control" placeholder="Tìm theo tên hoặc mô tả..."
+                        [value]="searchTerm()" (input)="onSearchInput($event)">
+                </div>
+
+                <!-- Start Date Filter -->
+                <div class="col-md-3 col-lg-2">
+                    <label for="startDateFilter" class="form-label">
+                        <i class="fas fa-calendar me-1"></i>
+                        Từ ngày
+                    </label>
+                    <input type="date" id="startDateFilter" class="form-control" [value]="startDateFilter() || ''"
+                        (change)="onStartDateChange($event)">
+                </div>
+
+                <!-- End Date Filter -->
+                <div class="col-md-3 col-lg-2">
+                    <label for="endDateFilter" class="form-label">
+                        <i class="fas fa-calendar me-1"></i>
+                        Đến ngày
+                    </label>
+                    <input type="date" id="endDateFilter" class="form-control" [value]="endDateFilter() || ''"
+                        (change)="onEndDateChange($event)">
+                </div>
+
+                <!-- Clear Filters Button -->
+                <div class="col-md-12 col-lg-4">
+                    <button type="button" class="btn btn-outline-secondary w-100" (click)="clearFilters()"
+                        [disabled]="!searchTerm() && !startDateFilter() && !endDateFilter()">
+                        <i class="fas fa-times me-1"></i>
+                        Xóa bộ lọc
+                    </button>
+                </div>
+            </div>
+
+            <!-- Results Summary -->
+            <div class="mt-3 text-muted small">
+                <i class="fas fa-info-circle me-1"></i>
+                Hiển thị {{ paginatedEvents().length }} / {{ filteredEvents().length }} sự kiện
+                @if (searchTerm() || startDateFilter() || endDateFilter()) {
+                (đã lọc từ {{ events().length }} sự kiện)
+                }
+            </div>
         </div>
     </div>
 
-    <div class="row mb-4">
+    <!-- Events Table -->
+    <div class="card shadow">
+        <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="card-title mb-0">
+                    Danh sách sự kiện
+                    <span class="badge bg-primary ms-2">{{ filteredEvents().length }}</span>
+                </h5>
+                <button class="btn btn-success" (click)="loadEvents()" [disabled]="loading()">
+                    @if (loading()) {
+                    <span class="spinner-border spinner-border-sm me-2"></span>
+                    } @else {
+                    <i class="fas fa-sync-alt me-2"></i>
+                    }
+                    Làm mới
+                </button>
+            </div>
+
+            @if (loading()) {
+            <div class="text-center py-4">
+                <div class="spinner-border" role="status">
+                    <span class="visually-hidden">Đang tải...</span>
+                </div>
+            </div>
+            } @else if (paginatedEvents().length === 0) {
+            <div class="text-center py-4">
+                <i class="fas fa-calendar-alt fa-3x text-muted mb-3"></i>
+                <p class="text-muted">
+                    @if (searchTerm() || startDateFilter() || endDateFilter()) {
+                    Không tìm thấy sự kiện nào phù hợp với bộ lọc
+                    } @else {
+                    Chưa có sự kiện nào được tạo
+                    }
+                </p>
+            </div>
+            } @else {
+
+            <!-- Desktop Table View -->
+            <div class="d-none d-lg-block">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th style="width: 80px;">ID</th>
+                                <th style="width: 250px;">Tên sự kiện</th>
+                                <th>Mô tả</th>
+                                <th style="width: 140px;">Bắt đầu</th>
+                                <th style="width: 140px;">Kết thúc</th>
+                                <th style="width: 150px;" class="text-center">Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @for (event of paginatedEvents(); track event.id) {
+                            <tr>
+                                <td class="align-middle">
+                                    <span class="badge bg-secondary">#{{ event.id }}</span>
+                                </td>
+                                <td class="align-middle">
+                                    <div class="fw-bold">{{ event.name }}</div>
+                                </td>
+                                <td class="align-middle">
+                                    <span class="text-muted">{{ event.description }}</span>
+                                </td>
+                                <td class="align-middle">
+                                    <small class="text-muted">{{ formatDate(event.startDate) }}</small>
+                                </td>
+                                <td class="align-middle">
+                                    <small class="text-muted">{{ formatDate(event.endDate) }}</small>
+                                </td>
+                                <td class="text-center align-middle">
+                                    <div class="btn-group" role="group">
+                                        <button type="button" class="btn btn-sm btn-outline-primary"
+                                            (click)="handleEditEvent(event)" [disabled]="loading()" title="Chỉnh sửa">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button type="button" class="btn btn-sm btn-outline-danger"
+                                            (click)="openDeleteModal(event)" [disabled]="loading()" title="Xóa">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Mobile/Tablet Card View -->
+            <div class="d-lg-none">
+                @for (event of paginatedEvents(); track event.id) {
+                <div class="card event-card mb-3">
+                    <div class="card-body">
+                        <!-- Event Header -->
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <div class="flex-grow-1">
+                                <div class="d-flex align-items-center mb-2">
+                                    <span class="badge bg-secondary me-2">#{{ event.id }}</span>
+                                    <h6 class="mb-0 fw-bold">{{ event.name }}</h6>
+                                </div>
+                                <p class="text-muted mb-2 small">{{ event.description }}</p>
+                                <div class="row text-sm">
+                                    <div class="col-6">
+                                        <small class="text-muted">
+                                            <i class="fas fa-play me-1"></i>
+                                            {{ formatDate(event.startDate) }}
+                                        </small>
+                                    </div>
+                                    <div class="col-6">
+                                        <small class="text-muted">
+                                            <i class="fas fa-stop me-1"></i>
+                                            {{ formatDate(event.endDate) }}
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="btn-group">
+                                <button class="btn btn-sm btn-outline-primary me-1" (click)="handleEditEvent(event)"
+                                    title="Chỉnh sửa">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="btn btn-sm btn-outline-danger" (click)="openDeleteModal(event)"
+                                    title="Xóa">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                }
+            </div>
+
+            }
+
+            <!-- Pagination -->
+            @if (totalPages() > 1) {
+            <nav class="mt-4">
+                <ul class="pagination justify-content-center">
+                    <li class="page-item" [class.disabled]="currentPage() === 1">
+                        <a class="page-link" href="javascript:void(0)" (click)="goToPage(currentPage() - 1)">
+                            <i class="fas fa-chevron-left"></i>
+                        </a>
+                    </li>
+
+                    @for (page of pageNumbers(); track page) {
+                    <li class="page-item" [class.active]="currentPage() === page">
+                        <a class="page-link" href="javascript:void(0)" (click)="goToPage(page)">
+                            {{ page }}
+                        </a>
+                    </li>
+                    }
+
+                    <li class="page-item" [class.disabled]="currentPage() === totalPages()">
+                        <a class="page-link" href="javascript:void(0)" (click)="goToPage(currentPage() + 1)">
+                            <i class="fas fa-chevron-right"></i>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+            }
+        </div>
+    </div>
+    }
+
+    <!-- Create/Edit View -->
+    @if (currentView() === 'create' || currentView() === 'edit') {
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3 mb-0 text-gray-800">
+            <i class="fas fa-calendar-alt me-2 text-primary"></i>
+            {{ currentView() === 'create' ? 'Tạo sự kiện mới' : 'Chỉnh sửa sự kiện' }}
+        </h1>
+        <div class="d-flex gap-2">
+            <button type="button" class="btn btn-success" (click)="saveEvent()"
+                [disabled]="!completionStatus().isComplete || loading()"
+                [class.disabled]="!completionStatus().isComplete">
+                <i class="fas fa-save me-2"></i>
+                Lưu
+            </button>
+            <button type="button" class="btn btn-secondary" (click)="backToList()" [disabled]="loading()">
+                <i class="fas fa-times me-2"></i>
+                Hủy
+            </button>
+        </div>
+    </div>
+
+    <!-- Completion Warning -->
+    @if (!completionStatus().isComplete && (selectedUsers().length > 0 || selectedDuties().length > 0)) {
+    <div class="alert alert-warning d-flex">
+        <i class="fas fa-exclamation-triangle me-3 mt-1"></i>
+        <div>
+            <h6 class="mb-2">Chưa hoàn thành phân công</h6>
+            @if (completionStatus().unassignedUsers.length > 0) {
+            <p class="mb-1 small">
+                <strong>Người dùng chưa được phân công:</strong>
+                {{ completionStatus().unassignedUsersNames }}
+            </p>
+            }
+            @if (completionStatus().unassignedDuties.length > 0) {
+            <p class="mb-0 small">
+                <strong>Nhiệm vụ chưa được gán:</strong>
+                {{ completionStatus().unassignedDutiesNames }}
+            </p>
+            }
+        </div>
+    </div>
+    }
+
+    <form [formGroup]="eventForm" class="row g-4">
+        <!-- Event Information -->
         <div class="col-12">
-            <div class="card">
+            <div class="card shadow">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-info-circle me-2 text-primary"></i>
+                        Thông tin sự kiện
+                    </h5>
+                </div>
                 <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h5 class="card-title mb-0">Danh sách sự kiện</h5>
-                        <button class="btn btn-primary">
-                            <i class="fas fa-plus me-2"></i>Tạo sự kiện mới
-                        </button>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label for="name" class="form-label">Tên sự kiện *</label>
+                            <input type="text" class="form-control" id="name" formControlName="name"
+                                placeholder="Nhập tên sự kiện">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="description" class="form-label">Mô tả *</label>
+                            <input type="text" class="form-control" id="description" formControlName="description"
+                                placeholder="Nhập mô tả sự kiện">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="startDate" class="form-label">Thời gian bắt đầu *</label>
+                            <input type="date" class="form-control" id="startDate" formControlName="startDate">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="endDate" class="form-label">Thời gian kết thúc *</label>
+                            <input type="date" class="form-control" id="endDate" formControlName="endDate">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Duties Management -->
+        <div class="col-12">
+            <div class="card shadow">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="fas fa-tasks me-2 text-warning"></i>
+                        Nhiệm vụ và điểm số ({{ selectedDuties().length }} nhiệm vụ)
+                    </h5>
+                    <button type="button" class="btn btn-warning btn-sm" (click)="showDutyModal.set(true)">
+                        <i class="fas fa-plus me-1"></i>
+                        Thêm nhiệm vụ
+                    </button>
+                </div>
+                <div class="card-body">
+                    @if (selectedDuties().length === 0) {
+                    <div class="text-center py-5 text-muted">
+                        <i class="fas fa-tasks fa-3x mb-3 opacity-50"></i>
+                        <div>Chưa có nhiệm vụ nào được chọn</div>
+                        <small>Nhấn "Thêm nhiệm vụ" để bắt đầu</small>
+                    </div>
+                    } @else {
+                    <div class="row g-3">
+                        @for (dutyId of selectedDuties(); track dutyId) {
+                        <div class="col-md-6 col-lg-4">
+                            <div class="border rounded p-3 position-relative">
+                                <button type="button" class="btn-close position-absolute top-0 end-0 m-2"
+                                    (click)="removeDutyFromEvent(dutyId)">
+                                </button>
+                                <h6 class="fw-bold mb-2">{{ getDutyById(dutyId)?.name }}</h6>
+                                <p class="text-muted small mb-3">{{ getDutyById(dutyId)?.description }}</p>
+
+                                @if (getDutyAssignedUser(dutyId)) {
+                                <div class="alert alert-success py-2 mb-3">
+                                    <small>
+                                        <strong>Đã gán:</strong> {{ getUserName(getDutyAssignedUser(dutyId)!) }}
+                                    </small>
+                                </div>
+                                }
+
+                                <div>
+                                    <label class="form-label small">Điểm</label>
+                                    <input type="number" class="form-control form-control-sm"
+                                        [value]="dutyScores()[dutyId] || 0"
+                                        (input)="updateDutyScore(dutyId, +$any($event.target).value)" min="0" step="0.1"
+                                        placeholder="0">
+                                </div>
+                            </div>
+                        </div>
+                        }
+                    </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- User Assignment -->
+        <div class="col-12">
+            <div class="card shadow">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="fas fa-users me-2 text-success"></i>
+                        Phân công nhiệm vụ ({{ selectedUsers().length }} người dùng)
+                    </h5>
+                    <button type="button" class="btn btn-success btn-sm" (click)="showUserModal.set(true)">
+                        <i class="fas fa-plus me-1"></i>
+                        Thêm người dùng
+                    </button>
+                </div>
+                <div class="card-body">
+                    @if (selectedUsers().length === 0) {
+                    <div class="text-center py-5 text-muted">
+                        <i class="fas fa-users fa-3x mb-3 opacity-50"></i>
+                        <div>Chưa có người dùng nào được chọn</div>
+                        <small>Nhấn "Thêm người dùng" để bắt đầu phân công</small>
+                    </div>
+                    } @else {
+                    <div class="alert alert-info mb-4">
+                        <small>
+                            <strong>Lưu ý:</strong> Mỗi người dùng chỉ có thể được gán một nhiệm vụ duy nhất.
+                            Mỗi nhiệm vụ chỉ có thể được gán cho một người duy nhất.
+                        </small>
                     </div>
 
-                    <div class="table-responsive">
+                    <!-- Desktop Table -->
+                    <div class="table-responsive d-none d-md-block">
                         <table class="table table-hover">
                             <thead class="table-light">
                                 <tr>
-                                    <th>Tên sự kiện</th>
-                                    <th>Ngày bắt đầu</th>
-                                    <th>Ngày kết thúc</th>
-                                    <th>Địa điểm</th>
-                                    <th>Trạng thái</th>
-                                    <th>Hành động</th>
+                                    <th>Người dùng</th>
+                                    <th>Học hàm/Học vị</th>
+                                    <th>Nhiệm vụ được gán</th>
+                                    <th>Điểm</th>
+                                    <th class="text-center">Thao tác</th>
                                 </tr>
                             </thead>
                             <tbody>
+                                @for (userId of selectedUsers(); track userId) {
                                 <tr>
-                                    <td>Hội thảo công nghệ 2025</td>
-                                    <td>20/01/2025</td>
-                                    <td>22/01/2025</td>
-                                    <td>Hội trường A</td>
-                                    <td><span class="badge bg-success">Đang diễn ra</span></td>
+                                    <td class="fw-medium">{{ getUserById(userId)?.fullName }}</td>
+                                    <td class="text-muted">
+                                        {{ getAcademicRankDisplay(getUserById(userId)?.academicRank || '') }} -
+                                        {{ getAcademicDegreeDisplay(getUserById(userId)?.academicDegree || '') }}
+                                    </td>
                                     <td>
-                                        <button class="btn btn-sm btn-outline-primary me-2">
-                                            <i class="fas fa-edit"></i>
-                                        </button>
-                                        <button class="btn btn-sm btn-outline-info me-2">
-                                            <i class="fas fa-eye"></i>
-                                        </button>
-                                        <button class="btn btn-sm btn-outline-danger">
+                                        <select class="form-select form-select-sm" [value]="getUserDuty(userId) || ''"
+                                            (change)="assignUserToDuty(userId, +$any($event.target).value || null)">
+                                            <option value="">-- Chọn nhiệm vụ --</option>
+                                            @for (dutyId of selectedDuties(); track dutyId) {
+                                            <option [value]="dutyId"
+                                                [disabled]="getDutyAssignedUser(dutyId) && getDutyAssignedUser(dutyId) !== userId">
+                                                {{ getDutyById(dutyId)?.name }} ({{ dutyScores()[dutyId] || 0 }} điểm)
+                                                @if (getDutyAssignedUser(dutyId) && getDutyAssignedUser(dutyId) !==
+                                                userId) {
+                                                - Đã gán cho {{ getUserName(getDutyAssignedUser(dutyId)!) }}
+                                                }
+                                            </option>
+                                            }
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <span class="badge"
+                                            [class]="getUserDuty(userId) ? 'bg-success' : 'bg-secondary'">
+                                            {{ getUserDuty(userId) ? (dutyScores()[getUserDuty(userId)!] || 0) : 0 }}
+                                            điểm
+                                        </span>
+                                    </td>
+                                    <td class="text-center">
+                                        <button type="button" class="btn btn-sm btn-outline-danger"
+                                            (click)="removeUserFromEvent(userId)">
                                             <i class="fas fa-trash"></i>
                                         </button>
                                     </td>
                                 </tr>
-                                <tr>
-                                    <td>Khóa học lập trình</td>
-                                    <td>25/01/2025</td>
-                                    <td>30/01/2025</td>
-                                    <td>Phòng lab B</td>
-                                    <td><span class="badge bg-warning">Sắp tới</span></td>
-                                    <td>
-                                        <button class="btn btn-sm btn-outline-primary me-2">
-                                            <i class="fas fa-edit"></i>
-                                        </button>
-                                        <button class="btn btn-sm btn-outline-info me-2">
-                                            <i class="fas fa-eye"></i>
-                                        </button>
-                                        <button class="btn btn-sm btn-outline-danger">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                    </td>
-                                </tr>
+                                }
                             </tbody>
                         </table>
                     </div>
+
+                    <!-- Mobile Cards -->
+                    <div class="d-md-none">
+                        @for (userId of selectedUsers(); track userId) {
+                        <div class="card mb-3">
+                            <div class="card-body">
+                                <h6 class="card-title">{{ getUserById(userId)?.fullName }}</h6>
+                                <p class="card-text small text-muted">
+                                    {{ getAcademicRankDisplay(getUserById(userId)?.academicRank || '') }} -
+                                    {{ getAcademicDegreeDisplay(getUserById(userId)?.academicDegree || '') }}
+                                </p>
+
+                                <div class="mb-3">
+                                    <label class="form-label small">Nhiệm vụ được gán</label>
+                                    <select class="form-select form-select-sm" [value]="getUserDuty(userId) || ''"
+                                        (change)="assignUserToDuty(userId, +$any($event.target).value || null)">
+                                        <option value="">-- Chọn nhiệm vụ --</option>
+                                        @for (dutyId of selectedDuties(); track dutyId) {
+                                        <option [value]="dutyId"
+                                            [disabled]="getDutyAssignedUser(dutyId) && getDutyAssignedUser(dutyId) !== userId">
+                                            {{ getDutyById(dutyId)?.name }} ({{ dutyScores()[dutyId] || 0 }} điểm)
+                                            @if (getDutyAssignedUser(dutyId) && getDutyAssignedUser(dutyId) !== userId)
+                                            {
+                                            - Đã gán
+                                            }
+                                        </option>
+                                        }
+                                    </select>
+                                </div>
+
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="badge" [class]="getUserDuty(userId) ? 'bg-success' : 'bg-secondary'">
+                                        {{ getUserDuty(userId) ? (dutyScores()[getUserDuty(userId)!] || 0) : 0 }} điểm
+                                    </span>
+                                    <button type="button" class="btn btn-sm btn-outline-danger"
+                                        (click)="removeUserFromEvent(userId)">
+                                        <i class="fas fa-trash me-1"></i>
+                                        Xóa
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        }
+                    </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Assignment Summary -->
+        @if (assignments().length > 0) {
+        <div class="col-12">
+            <div class="card shadow">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-clipboard-list me-2 text-info"></i>
+                        Tóm tắt phân công
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        @for (assignment of assignments(); track $index) {
+                        <div class="col-md-6 col-lg-4">
+                            <div class="card h-100">
+                                <div class="card-body">
+                                    <h6 class="card-title">{{ getUserName(assignment.userId) }}</h6>
+                                    <p class="card-text small">{{ getDutyName(assignment.dutyId) }}</p>
+                                    <span class="badge bg-primary">{{ dutyScores()[assignment.dutyId] || 0 }}
+                                        điểm</span>
+                                </div>
+                            </div>
+                        </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+        }
+    </form>
+    }
+</div>
+
+<!-- Duty Selection Modal -->
+@if (showDutyModal()) {
+<div class="modal show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Chọn nhiệm vụ</h5>
+                <button type="button" class="btn-close" (click)="showDutyModal.set(false)"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <input type="text" class="form-control" placeholder="Tìm kiếm nhiệm vụ..."
+                        [value]="dutySearchTerm()" (input)="dutySearchTerm.set($any($event.target).value)">
+                </div>
+
+                <div class="row g-2">
+                    @for (duty of filteredDuties(); track duty.id) {
+                    <div class="col-12">
+                        <div class="card card-hover" (click)="addDutyToEvent(duty.id)" style="cursor: pointer;">
+                            <div class="card-body py-3">
+                                <h6 class="card-title mb-1">{{ duty.name }}</h6>
+                                <p class="card-text small text-muted mb-0">{{ duty.description }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    } @empty {
+                    <div class="col-12 text-center py-5 text-muted">
+                        <i class="fas fa-tasks fa-3x mb-3 opacity-50"></i>
+                        <div>Không tìm thấy nhiệm vụ nào</div>
+                    </div>
+                    }
                 </div>
             </div>
         </div>
     </div>
 </div>
+}
+
+<!-- User Selection Modal -->
+@if (showUserModal()) {
+<div class="modal show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Chọn người dùng</h5>
+                <button type="button" class="btn-close" (click)="showUserModal.set(false)"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <input type="text" class="form-control" placeholder="Tìm kiếm người dùng..."
+                        [value]="userSearchTerm()" (input)="userSearchTerm.set($any($event.target).value)">
+                </div>
+
+                <div class="row g-2">
+                    @for (user of filteredUsers(); track user.id) {
+                    <div class="col-12">
+                        <div class="card card-hover" (click)="addUserToEvent(user.id)" style="cursor: pointer;">
+                            <div class="card-body py-3">
+                                <h6 class="card-title mb-1">{{ user.fullName }}</h6>
+                                <p class="card-text small text-muted mb-0">
+                                    {{ getAcademicRankDisplay(user.academicRank) }} - {{
+                                    getAcademicDegreeDisplay(user.academicDegree) }}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    } @empty {
+                    <div class="col-12 text-center py-5 text-muted">
+                        <i class="fas fa-users fa-3x mb-3 opacity-50"></i>
+                        <div>Không tìm thấy người dùng nào</div>
+                    </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+}
+
+<!-- Delete Confirmation Modal -->
+@if (showDeleteModal()) {
+<div class="modal show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Xác nhận xóa</h5>
+                <button type="button" class="btn-close" (click)="closeDeleteModal()"></button>
+            </div>
+            <div class="modal-body">
+                <p>Bạn có chắc chắn muốn xóa sự kiện "<strong>{{ deletingEvent()?.name }}</strong>"?</p>
+                <p class="text-muted small">Hành động này không thể hoàn tác.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" (click)="closeDeleteModal()">Hủy</button>
+                <button type="button" class="btn btn-danger" (click)="deleteEvent()" [disabled]="loading()">
+                    @if (loading()) {
+                    <span class="spinner-border spinner-border-sm me-2"></span>
+                    }
+                    Xóa
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+}
