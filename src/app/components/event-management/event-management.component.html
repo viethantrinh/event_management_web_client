@@ -414,11 +414,12 @@
                                         {{ getAcademicDegreeDisplay(getUserById(userId)?.academicDegree || '') }}
                                     </td>
                                     <td>
-                                        <select class="form-select form-select-sm" [value]="getUserDuty(userId) || ''"
+                                        <select class="form-select form-select-sm"
                                             (change)="assignUserToDuty(userId, +$any($event.target).value || null)">
-                                            <option value="">-- Chọn nhiệm vụ --</option>
+                                            <option value="" [selected]="!getUserDuty(userId)">-- Chọn nhiệm vụ --
+                                            </option>
                                             @for (dutyId of selectedDuties(); track dutyId) {
-                                            <option [value]="dutyId"
+                                            <option [value]="dutyId" [selected]="getUserDuty(userId) === dutyId"
                                                 [disabled]="getDutyAssignedUser(dutyId) && getDutyAssignedUser(dutyId) !== userId">
                                                 {{ getDutyById(dutyId)?.name }} ({{ dutyScores()[dutyId] || 0 }} điểm)
                                                 @if (getDutyAssignedUser(dutyId) && getDutyAssignedUser(dutyId) !==
@@ -461,11 +462,11 @@
 
                                 <div class="mb-3">
                                     <label class="form-label small">Nhiệm vụ được gán</label>
-                                    <select class="form-select form-select-sm" [value]="getUserDuty(userId) || ''"
+                                    <select class="form-select form-select-sm"
                                         (change)="assignUserToDuty(userId, +$any($event.target).value || null)">
-                                        <option value="">-- Chọn nhiệm vụ --</option>
+                                        <option value="" [selected]="!getUserDuty(userId)">-- Chọn nhiệm vụ --</option>
                                         @for (dutyId of selectedDuties(); track dutyId) {
-                                        <option [value]="dutyId"
+                                        <option [value]="dutyId" [selected]="getUserDuty(userId) === dutyId"
                                             [disabled]="getDutyAssignedUser(dutyId) && getDutyAssignedUser(dutyId) !== userId">
                                             {{ getDutyById(dutyId)?.name }} ({{ dutyScores()[dutyId] || 0 }} điểm)
                                             @if (getDutyAssignedUser(dutyId) && getDutyAssignedUser(dutyId) !== userId)
