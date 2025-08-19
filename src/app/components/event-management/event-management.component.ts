@@ -8,11 +8,12 @@ import { UserResponse } from '../../models/user.model';
 import { DutyService } from '../../services/duty.service';
 import { EventService } from '../../services/event.service';
 import { UserService } from '../../services/user.service';
+import { EventReportComponent } from '../event-report/event-report.component';
 
 @Component({
     selector: 'app-event-management',
     standalone: true,
-    imports: [CommonModule, FormsModule, ReactiveFormsModule],
+    imports: [CommonModule, FormsModule, ReactiveFormsModule, EventReportComponent],
     templateUrl: './event-management.component.html',
     styleUrl: './event-management.component.css'
 })
@@ -38,6 +39,8 @@ export class EventManagementComponent implements OnInit {
     public showUserModal = signal<boolean>(false);
     public showDeleteModal = signal<boolean>(false);
     public deletingEvent = signal<Event | null>(null);
+    public showEventReport = signal<boolean>(false);
+    public selectedEventIdForReport = signal<number>(0);
 
     // Search and filter terms
     public searchTerm = signal<string>('');
@@ -545,6 +548,17 @@ export class EventManagementComponent implements OnInit {
         const target = changeEvent.target as HTMLInputElement;
         this.endDateFilter.set(target.value || null);
         this.currentPage.set(1);
+    }
+
+    // Event Report Methods
+    public openEventReport(eventId: number): void {
+        this.selectedEventIdForReport.set(eventId);
+        this.showEventReport.set(true);
+    }
+
+    public closeEventReport(): void {
+        this.showEventReport.set(false);
+        this.selectedEventIdForReport.set(0);
     }
 
     // Make Math available in template

@@ -139,6 +139,11 @@
                                 </td>
                                 <td class="text-center align-middle">
                                     <div class="btn-group" role="group">
+                                        <button type="button" class="btn btn-sm btn-outline-info"
+                                            (click)="openEventReport(event.id)" [disabled]="loading()"
+                                            title="Báo cáo sự kiện">
+                                            <i class="fas fa-chart-bar"></i>
+                                        </button>
                                         <button type="button" class="btn btn-sm btn-outline-primary"
                                             (click)="handleEditEvent(event)" [disabled]="loading()" title="Chỉnh sửa">
                                             <i class="fas fa-edit"></i>
@@ -185,6 +190,10 @@
                                 </div>
                             </div>
                             <div class="btn-group">
+                                <button class="btn btn-sm btn-outline-info me-1" (click)="openEventReport(event.id)"
+                                    title="Báo cáo sự kiện">
+                                    <i class="fas fa-chart-bar"></i>
+                                </button>
                                 <button class="btn btn-sm btn-outline-primary me-1" (click)="handleEditEvent(event)"
                                     title="Chỉnh sửa">
                                     <i class="fas fa-edit"></i>
@@ -646,3 +655,7 @@
     </div>
 </div>
 }
+
+<!-- Event Report Modal -->
+<app-event-report [eventId]="selectedEventIdForReport()" [isVisible]="showEventReport()" (onClose)="closeEventReport()">
+</app-event-report>

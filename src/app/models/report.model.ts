@@ -25,3 +25,30 @@ export interface UserReportApiResponse {
     timestamp: string;
     result: UserReportResponse;
 }
+
+// Event Report Models
+export interface EventParticipant {
+    sequenceNumber: number;
+    userId: string;
+    fullName: string;
+    dutyName: string;
+    score: number;
+}
+
+export interface EventReportResponse {
+    eventId: number;
+    eventName: string;
+    eventDescription: string;
+    startDate: string;
+    endDate: string;
+    participants: EventParticipant[];
+    totalParticipants: number;
+    dutyDistribution: { [key: string]: number };
+}
+
+export interface EventReportApiResponse {
+    code: number;
+    message: string;
+    timestamp: string;
+    result: EventReportResponse;
+}

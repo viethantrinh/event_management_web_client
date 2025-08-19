@@ -1,0 +1,307 @@
+<!-- Event Report Modal -->
+@if (isVisible) {
+<div class="modal d-block event-report-modal" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <!-- Modal Header -->
+            <div class="modal-header bg-primary text-white">
+                <h4 class="modal-title mb-0">
+                    <i class="fas fa-chart-bar me-2"></i>
+                    BÁO CÁO CHI TIẾT THEO SỰ KIỆN
+                </h4>
+                <button type="button" class="btn-close btn-close-white" (click)="closeModal()"></button>
+            </div>
+
+            <!-- Modal Body -->
+            <div class="modal-body p-0">
+                @if (loading()) {
+                <!-- Loading State -->
+                <div class="text-center py-5">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Đang tải...</span>
+                    </div>
+                    <div class="mt-3">Đang tải báo cáo sự kiện...</div>
+                </div>
+                } @else if (error()) {
+                <!-- Error State -->
+                <div class="alert alert-danger m-4">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    {{ error() }}
+                    <button class="btn btn-outline-danger btn-sm ms-3" (click)="loadEventReport()">
+                        <i class="fas fa-retry me-1"></i>Thử lại
+                    </button>
+                </div>
+                } @else if (eventReport()) {
+                <!-- Report Content -->
+                <div class="report-content">
+                    <!-- Header Section -->
+                    <div class="report-header p-4 bg-light border-bottom">
+                        <div class="row g-3 align-items-center">
+                            <!-- Search -->
+                            <div class="col-md-4">
+                                <div class="input-group">
+                                    <span class="input-group-text">
+                                        <i class="fas fa-search"></i>
+                                    </span>
+                                    <input type="text" class="form-control"
+                                        placeholder="Nhập tên người dùng để tìm kiếm" [value]="searchTerm()"
+                                        (input)="onSearch($any($event.target).value)">
+                                </div>
+                            </div>
+
+                            <!-- Duty Filter -->
+                            <div class="col-md-3">
+                                <select class="form-select" [value]="dutyFilter()"
+                                    (change)="onDutyFilter($any($event.target).value)">
+                                    <option value="">Tất cả nhiệm vụ</option>
+                                    @for (duty of uniqueDuties(); track duty) {
+                                    <option [value]="duty">{{ duty }}</option>
+                                    }
+                                </select>
+                            </div>
+
+                            <!-- Action Buttons -->
+                            <div class="col-md-5 text-end">
+                                <button class="btn btn-outline-primary me-2" (click)="loadEventReport()">
+                                    <i class="fas fa-sync-alt me-1"></i>Tìm kiếm
+                                </button>
+                                <!-- <button class="btn btn-success" (click)="exportToPDF()">
+                                    <i class="fas fa-file-pdf me-1"></i>Xuất PDF
+                                </button> -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Event Information Table -->
+                    <div class="event-info p-4">
+                        <table class="table event-info-table mb-0">
+                            <tbody>
+                                <tr>
+                                    <td colspan="2" class="text-center fw-bold fs-5 py-3" style="background: white;">
+                                        {{ eventReport()!.eventName }}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="fw-bold" style="background: white; width: 50%;">
+                                        <i class="fas fa-play text-success me-2"></i>Ngày bắt đầu:
+                                        <span class="fw-normal">{{ formatDate(eventReport()!.startDate) }}</span>
+                                    </td>
+                                    <td class="fw-bold" style="background: white; width: 50%;">
+                                        <i class="fas fa-stop text-danger me-2"></i>Ngày kết thúc:
+                                        <span class="fw-normal">{{ formatDate(eventReport()!.endDate) }}</span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Statistics Cards -->
+                    <!-- <div class="statistics-cards p-4 bg-light">
+                        <div class="row g-3">
+                            <div class="col-md-3 col-sm-6">
+                                <div class="card border-0 shadow-sm h-100">
+                                    <div class="card-body text-center">
+                                        <div class="text-primary mb-2">
+                                            <i class="fas fa-users fa-2x"></i>
+                                        </div>
+                                        <h5 class="card-title mb-1">{{ eventReport()!.totalParticipants }}</h5>
+                                        <p class="card-text text-muted small">Tổng người tham gia</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3 col-sm-6">
+                                <div class="card border-0 shadow-sm h-100">
+                                    <div class="card-body text-center">
+                                        <div class="text-success mb-2">
+                                            <i class="fas fa-star fa-2x"></i>
+                                        </div>
+                                        <h5 class="card-title mb-1">{{ averageScore() }}</h5>
+                                        <p class="card-text text-muted small">Điểm trung bình</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3 col-sm-6">
+                                <div class="card border-0 shadow-sm h-100">
+                                    <div class="card-body text-center">
+                                        <div class="text-warning mb-2">
+                                            <i class="fas fa-trophy fa-2x"></i>
+                                        </div>
+                                        <h5 class="card-title mb-1">{{ scoreStats().highest }}</h5>
+                                        <p class="card-text text-muted small">Điểm cao nhất</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3 col-sm-6">
+                                <div class="card border-0 shadow-sm h-100">
+                                    <div class="card-body text-center">
+                                        <div class="text-info mb-2">
+                                            <i class="fas fa-percentage fa-2x"></i>
+                                        </div>
+                                        <h5 class="card-title mb-1">{{ activeParticipationRate() }}%</h5>
+                                        <p class="card-text text-muted small">Tỷ lệ tham gia tích cực</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div> -->
+
+                    <!-- Participants Table -->
+                    <div class="participants-table p-4">
+                        <div class="card border-0 shadow-sm">
+                            <div class="card-header bg-warning text-dark">
+                                <h5 class="mb-0">
+                                    <i class="fas fa-users me-2"></i>
+                                    Danh sách người tham gia
+                                    <span class="badge bg-dark ms-2">{{ filteredAndSortedParticipants().length }}</span>
+                                </h5>
+                            </div>
+                            <div class="card-body p-0">
+                                @if (filteredAndSortedParticipants().length === 0) {
+                                <div class="text-center py-5">
+                                    <i class="fas fa-users-slash fa-3x text-muted mb-3"></i>
+                                    <p class="text-muted">Không có người tham gia nào được tìm thấy</p>
+                                </div>
+                                } @else {
+                                <!-- Desktop Table -->
+                                <div class="d-none d-lg-block">
+                                    <div class="table-responsive">
+                                        <table class="table table-hover mb-0 participants-table-desktop">
+                                            <thead>
+                                                <tr>
+                                                    <th class="border-dark text-center"
+                                                        style="background-color: #FFD700; color: black; font-weight: bold; width: 8%;">
+                                                        TT</th>
+                                                    <th class="border-dark sortable"
+                                                        style="background-color: #FFD700; color: black; font-weight: bold; width: 40%;"
+                                                        (click)="onSort('fullName')">
+                                                        Họ và tên
+                                                        <i [class]="getSortIcon('fullName')" class="ms-1"></i>
+                                                    </th>
+                                                    <th class="border-dark sortable"
+                                                        style="background-color: #FFD700; color: black; font-weight: bold; width: 35%;"
+                                                        (click)="onSort('dutyName')">
+                                                        Nhiệm vụ
+                                                        <i [class]="getSortIcon('dutyName')" class="ms-1"></i>
+                                                    </th>
+                                                    <th class="border-dark sortable text-center"
+                                                        style="background-color: #FFD700; color: black; font-weight: bold; width: 17%;"
+                                                        (click)="onSort('score')">
+                                                        Điểm
+                                                        <i [class]="getSortIcon('score')" class="ms-1"></i>
+                                                    </th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @for (participant of filteredAndSortedParticipants(); track
+                                                participant.userId; let i = $index) {
+                                                <tr [class]="i % 2 === 0 ? 'table-light' : ''">
+                                                    <td class="border-dark text-center">{{ participant.sequenceNumber }}
+                                                    </td>
+                                                    <td class="border-dark">{{ participant.fullName }}</td>
+                                                    <td class="border-dark">{{ participant.dutyName }}</td>
+                                                    <td class="border-dark text-center">
+                                                        <span class="badge"
+                                                            [class]="participant.score >= 15 ? 'bg-success' : participant.score >= 10 ? 'bg-warning text-dark' : participant.score > 0 ? 'bg-info' : 'bg-secondary'">
+                                                            {{ participant.score }}
+                                                        </span>
+                                                    </td>
+                                                </tr>
+                                                }
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+
+                                <!-- Mobile Cards -->
+                                <div class="d-lg-none p-3">
+                                    @for (participant of filteredAndSortedParticipants(); track participant.userId; let
+                                    i = $index) {
+                                    <div class="card mb-3 border">
+                                        <div class="card-body">
+                                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                                <span class="badge bg-primary">#{{ participant.sequenceNumber }}</span>
+                                                <span class="badge"
+                                                    [class]="participant.score >= 15 ? 'bg-success' : participant.score >= 10 ? 'bg-warning text-dark' : participant.score > 0 ? 'bg-info' : 'bg-secondary'">
+                                                    {{ participant.score }} điểm
+                                                </span>
+                                            </div>
+                                            <h6 class="card-title">{{ participant.fullName }}</h6>
+                                            <p class="card-text">
+                                                <strong>Nhiệm vụ:</strong> {{ participant.dutyName }}
+                                            </p>
+                                        </div>
+                                    </div>
+                                    }
+                                </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Duty Distribution Statistics -->
+                    <!-- <div class="duty-distribution p-4 bg-light">
+                        <div class="card border-0 shadow-sm">
+                            <div class="card-header bg-info text-white">
+                                <h5 class="mb-0">
+                                    <i class="fas fa-chart-pie me-2"></i>
+                                    THỐNG KÊ PHÂN BỐ NHIỆM VỤ
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row g-3">
+                                    @for (duty of uniqueDuties(); track duty) {
+                                    <div class="col-md-6 col-lg-4">
+                                        <div class="duty-stat-item p-3 border rounded">
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <span class="fw-bold">{{ duty }}:</span>
+                                                <span class="badge bg-primary">{{ eventReport()!.dutyDistribution[duty]
+                                                    }} người</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    }
+                                </div>
+
+                                
+                                <div class="row mt-4">
+                                    <div class="col-md-6">
+                                        <div class="alert alert-info">
+                                            <strong>Tổng số người tham gia:</strong> {{ eventReport()!.totalParticipants
+                                            }}
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="alert alert-success">
+                                            <strong>Tổng điểm trung bình:</strong> {{ averageScore() }}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                @if (topDuty()) {
+                                <div class="alert alert-warning">
+                                    <strong>Nhiệm vụ có nhiều người nhất:</strong> {{ topDuty()!.duty }} ({{
+                                    topDuty()!.count }} người)
+                                </div>
+                                }
+                            </div>
+                        </div>
+                    </div> --> 
+                </div>
+                }
+            </div>
+
+            <!-- Modal Footer -->
+            @if (!loading() && !error()) {
+            <div class="modal-footer bg-light">
+                <button type="button" class="btn btn-secondary" (click)="closeModal()">
+                    <i class="fas fa-times me-1"></i>Đóng
+                </button>
+                <!-- <button type="button" class="btn btn-primary" (click)="exportToPDF()">
+                    <i class="fas fa-print me-1"></i>In báo cáo
+                </button> -->
+            </div>
+            }
+        </div>
+    </div>
+</div>
+}

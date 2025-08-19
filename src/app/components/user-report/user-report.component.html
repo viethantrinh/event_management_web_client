@@ -44,7 +44,7 @@
                                         <i class="fas fa-search"></i>
                                     </span>
                                     <input type="text" class="form-control"
-                                        placeholder="Nhập mã sinh viên hoặc tên để tìm kiếm" [value]="searchTerm()"
+                                        placeholder="Nhập tên sự kiện để tìm kiếm" [value]="searchTerm()"
                                         (input)="onSearch($any($event.target).value)">
                                 </div>
                             </div>
@@ -54,9 +54,9 @@
                                 <button class="btn btn-outline-primary me-2" (click)="loadUserReport()">
                                     <i class="fas fa-sync-alt me-1"></i>Tìm kiếm
                                 </button>
-                                <button class="btn btn-success" (click)="exportToPDF()">
+                                <!-- <button class="btn btn-success" (click)="exportToPDF()">
                                     <i class="fas fa-file-pdf me-1"></i>Xuất PDF
-                                </button>
+                                </button> -->
                             </div>
                         </div>
                     </div>
@@ -244,9 +244,9 @@
                 <button type="button" class="btn btn-secondary" (click)="closeModal()">
                     <i class="fas fa-times me-1"></i>Đóng
                 </button>
-                <button type="button" class="btn btn-primary" (click)="exportToPDF()">
+                <!-- <button type="button" class="btn btn-primary" (click)="exportToPDF()">
                     <i class="fas fa-print me-1"></i>In báo cáo
-                </button>
+                </button> -->
             </div>
             }
         </div>
