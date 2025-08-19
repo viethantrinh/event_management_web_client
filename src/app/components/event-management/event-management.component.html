@@ -341,10 +341,10 @@
                                 <h6 class="fw-bold mb-2">{{ getDutyById(dutyId)?.name }}</h6>
                                 <p class="text-muted small mb-3">{{ getDutyById(dutyId)?.description }}</p>
 
-                                @if (getDutyAssignedUser(dutyId)) {
+                                @if (getDutyAssignedUsers(dutyId).length > 0) {
                                 <div class="alert alert-success py-2 mb-3">
                                     <small>
-                                        <strong>Đã gán:</strong> {{ getUserName(getDutyAssignedUser(dutyId)!) }}
+                                        <strong>Đã gán cho:</strong> {{ getDutyAssignedUsersNames(dutyId) }}
                                     </small>
                                 </div>
                                 }
@@ -389,7 +389,7 @@
                     <div class="alert alert-info mb-4">
                         <small>
                             <strong>Lưu ý:</strong> Mỗi người dùng chỉ có thể được gán một nhiệm vụ duy nhất.
-                            Mỗi nhiệm vụ chỉ có thể được gán cho một người duy nhất.
+                            Một nhiệm vụ có thể được gán cho nhiều người khác nhau.
                         </small>
                     </div>
 
@@ -419,12 +419,11 @@
                                             <option value="" [selected]="!getUserDuty(userId)">-- Chọn nhiệm vụ --
                                             </option>
                                             @for (dutyId of selectedDuties(); track dutyId) {
-                                            <option [value]="dutyId" [selected]="getUserDuty(userId) === dutyId"
-                                                [disabled]="getDutyAssignedUser(dutyId) && getDutyAssignedUser(dutyId) !== userId">
+                                            <option [value]="dutyId" [selected]="getUserDuty(userId) === dutyId">
                                                 {{ getDutyById(dutyId)?.name }} ({{ dutyScores()[dutyId] || 0 }} điểm)
-                                                @if (getDutyAssignedUser(dutyId) && getDutyAssignedUser(dutyId) !==
-                                                userId) {
-                                                - Đã gán cho {{ getUserName(getDutyAssignedUser(dutyId)!) }}
+                                                @if (getDutyAssignedUsers(dutyId).length > 0 && getUserDuty(userId) !==
+                                                dutyId) {
+                                                - Đã có {{ getDutyAssignedUsers(dutyId).length }} người
                                                 }
                                             </option>
                                             }
@@ -466,12 +465,11 @@
                                         (change)="assignUserToDuty(userId, +$any($event.target).value || null)">
                                         <option value="" [selected]="!getUserDuty(userId)">-- Chọn nhiệm vụ --</option>
                                         @for (dutyId of selectedDuties(); track dutyId) {
-                                        <option [value]="dutyId" [selected]="getUserDuty(userId) === dutyId"
-                                            [disabled]="getDutyAssignedUser(dutyId) && getDutyAssignedUser(dutyId) !== userId">
+                                        <option [value]="dutyId" [selected]="getUserDuty(userId) === dutyId">
                                             {{ getDutyById(dutyId)?.name }} ({{ dutyScores()[dutyId] || 0 }} điểm)
-                                            @if (getDutyAssignedUser(dutyId) && getDutyAssignedUser(dutyId) !== userId)
-                                            {
-                                            - Đã gán
+                                            @if (getDutyAssignedUsers(dutyId).length > 0 && getUserDuty(userId) !==
+                                            dutyId) {
+                                            - Đã có {{ getDutyAssignedUsers(dutyId).length }} người
                                             }
                                         </option>
                                         }
@@ -508,20 +506,31 @@
                     </h5>
                 </div>
                 <div class="card-body">
-                    <div class="row g-3">
-                        @for (assignment of assignments(); track $index) {
-                        <div class="col-md-6 col-lg-4">
-                            <div class="card h-100">
-                                <div class="card-body">
-                                    <h6 class="card-title">{{ getUserName(assignment.userId) }}</h6>
-                                    <p class="card-text small">{{ getDutyName(assignment.dutyId) }}</p>
-                                    <span class="badge bg-primary">{{ dutyScores()[assignment.dutyId] || 0 }}
-                                        điểm</span>
+                    <!-- Group assignments by duty -->
+                    @for (dutyId of selectedDuties(); track dutyId) {
+                    @if (getDutyAssignedUsers(dutyId).length > 0) {
+                    <div class="card mb-3">
+                        <div class="card-header">
+                            <h6 class="mb-0">
+                                {{ getDutyName(dutyId) }}
+                                <span class="badge bg-primary ms-2">{{ dutyScores()[dutyId] || 0 }} điểm</span>
+                            </h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="row g-2">
+                                @for (userId of getDutyAssignedUsers(dutyId); track userId) {
+                                <div class="col-md-6 col-lg-4">
+                                    <div class="d-flex align-items-center p-2 bg-light rounded">
+                                        <i class="fas fa-user me-2 text-success"></i>
+                                        <span class="small">{{ getUserName(userId) }}</span>
+                                    </div>
                                 </div>
+                                }
                             </div>
                         </div>
-                        }
                     </div>
+                    }
+                    }
                 </div>
             </div>
         </div>

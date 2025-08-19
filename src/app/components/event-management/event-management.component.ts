@@ -136,6 +136,7 @@ export class EventManagementComponent implements OnInit {
             !this.assignments().find(a => a.userId === userId)
         );
 
+        // A duty is considered unassigned if it has no users assigned to it
         const unassignedDuties = this.selectedDuties().filter(dutyId =>
             !this.assignments().find(a => a.dutyId === dutyId)
         );
@@ -398,6 +399,7 @@ export class EventManagementComponent implements OnInit {
         const newScores = { ...this.dutyScores() };
         delete newScores[dutyId];
         this.dutyScores.set(newScores);
+        // Remove all assignments for this duty (since multiple users can be assigned to one duty)
         this.assignments.set(this.assignments().filter(a => a.dutyId !== dutyId));
     }
 
@@ -424,11 +426,15 @@ export class EventManagementComponent implements OnInit {
         const newAssignments = this.assignments().filter(a => a.userId !== userId);
 
         if (dutyId) {
-            const existingAssignment = this.assignments().find(a => a.dutyId === dutyId);
-            if (existingAssignment && existingAssignment.userId !== userId) {
-                const userName = this.getUserName(existingAssignment.userId);
-                alert(`Nhiệm vụ này đã được gán cho ${userName}. Mỗi nhiệm vụ chỉ có thể được gán cho một người duy nhất.`);
-                return;
+            // Check if user is already assigned to another duty
+            const userCurrentAssignment = this.assignments().find(a => a.userId === userId);
+            if (userCurrentAssignment && userCurrentAssignment.dutyId !== dutyId) {
+                const currentDutyName = this.getDutyName(userCurrentAssignment.dutyId);
+                const newDutyName = this.getDutyName(dutyId);
+                const confirmChange = confirm(`Người dùng hiện đang được gán nhiệm vụ "${currentDutyName}". Bạn có muốn chuyển sang nhiệm vụ "${newDutyName}" không?`);
+                if (!confirmChange) {
+                    return;
+                }
             }
 
             newAssignments.push({ userId, dutyId });
@@ -443,9 +449,16 @@ export class EventManagementComponent implements OnInit {
         return assignment ? assignment.dutyId : null;
     }
 
-    public getDutyAssignedUser(dutyId: number): string | null {
-        const assignment = this.assignments().find(a => a.dutyId === dutyId);
-        return assignment ? assignment.userId : null;
+    public getDutyAssignedUsers(dutyId: number): string[] {
+        return this.assignments()
+            .filter(a => a.dutyId === dutyId)
+            .map(a => a.userId);
+    }
+
+    public getDutyAssignedUsersNames(dutyId: number): string {
+        const userIds = this.getDutyAssignedUsers(dutyId);
+        if (userIds.length === 0) return '';
+        return userIds.map(userId => this.getUserName(userId)).join(', ');
     }
 
     public getUserName(userId: string): string {
