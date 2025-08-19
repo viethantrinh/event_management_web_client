@@ -295,8 +295,8 @@ export class EventManagementComponent implements OnInit {
 
     // Event operations
     public saveEvent(): void {
-        if (!this.eventForm.valid || !this.completionStatus().isComplete) {
-            alert('Vui lòng hoàn thành tất cả thông tin và phân công!');
+        if (!this.eventForm.valid) {
+            alert('Vui lòng hoàn thành tất cả thông tin bắt buộc!');
             return;
         }
 
@@ -481,6 +481,11 @@ export class EventManagementComponent implements OnInit {
 
     public getAcademicRankDisplay(rank: string): string {
         const ranks: { [key: string]: string } = {
+            'TG': 'Trợ giảng',
+            'GVC': 'Giảng viên chính',
+            'PGS': 'Phó giáo sư',
+            'GS': 'Giáo sư',
+            // Keep old values for backward compatibility
             'assistant': 'Trợ giảng',
             'lecturer': 'Giảng viên',
             'teacher': 'Giáo viên',
@@ -492,6 +497,10 @@ export class EventManagementComponent implements OnInit {
 
     public getAcademicDegreeDisplay(degree: string): string {
         const degrees: { [key: string]: string } = {
+            'KS': 'Kỹ sư',
+            'ThS': 'Thạc sĩ',
+            'TS': 'Tiến sĩ',
+            // Keep old values for backward compatibility
             'bachelor': 'Cử nhân',
             'master': 'Thạc sĩ',
             'doctor': 'Tiến sĩ',

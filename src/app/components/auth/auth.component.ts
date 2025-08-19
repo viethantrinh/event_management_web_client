@@ -1,9 +1,9 @@
-import {Component, inject, OnInit} from '@angular/core';
-import {CommonModule} from '@angular/common';
-import {ReactiveFormsModule, FormBuilder, FormGroup, Validators} from '@angular/forms';
-import {AuthService} from '../../services/auth.service';
-import {Router} from '@angular/router';
-import {SignInRequest, SignUpRequest} from '../../models/auth.model';
+import { CommonModule } from '@angular/common';
+import { Component, inject, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
+import { SignInRequest, SignUpRequest } from '../../models/auth.model';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-auth',
@@ -17,6 +17,20 @@ export class AuthComponent implements OnInit {
   isSignIn = true;
   signInForm: FormGroup;
   signUpForm: FormGroup;
+
+  // Constants
+  public readonly academicRanks = [
+    { value: 'TG', label: 'Trợ giảng' },
+    { value: 'GVC', label: 'Giảng viên chính' },
+    { value: 'PGS', label: 'Phó giáo sư' },
+    { value: 'GS', label: 'Giáo sư' }
+  ];
+
+  public readonly academicDegrees = [
+    { value: 'KS', label: 'Kỹ sư' },
+    { value: 'ThS', label: 'Thạc sĩ' },
+    { value: 'TS', label: 'Tiến sĩ' }
+  ];
 
   // dependencies
   private readonly fb = inject(FormBuilder)
@@ -179,10 +193,10 @@ export class AuthComponent implements OnInit {
         email: this.signUpForm.value.email,
         workEmail: this.signUpForm.value.workEmail,
         password: this.signUpForm.value.password,
-        fullName: this.signUpForm.value.password,
-        phoneNumber: this.signUpForm.value.password,
-        academicRank: this.signUpForm.value.password,
-        academicDegree: this.signUpForm.value.password
+        fullName: this.signUpForm.value.fullName,
+        phoneNumber: this.signUpForm.value.phoneNumber,
+        academicRank: this.signUpForm.value.academicRank,
+        academicDegree: this.signUpForm.value.academicDegree
       }
 
       this.authService.signUpApi(signUpRequest).subscribe({

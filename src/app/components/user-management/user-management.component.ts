@@ -38,10 +38,10 @@ export class UserManagementComponent implements OnInit {
     // Constants
     public readonly roles = ['USER', 'ADMIN'];
     public readonly academicRanks = [
-        'assistant', 'lecturer', 'teacher', 'associate_professor', 'professor'
+        'TG', 'GVC', 'PGS', 'GS'
     ];
     public readonly academicDegrees = [
-        'bachelor', 'master', 'doctor', 'phd'
+        'KS', 'ThS', 'TS'
     ];
 
     // Computed properties
@@ -264,6 +264,11 @@ export class UserManagementComponent implements OnInit {
 
     public getAcademicRankDisplay(rank: string): string {
         const ranks: { [key: string]: string } = {
+            'TG': 'Trợ giảng',
+            'GVC': 'Giảng viên chính',
+            'PGS': 'Phó giáo sư',
+            'GS': 'Giáo sư',
+            // Keep old values for backward compatibility
             'assistant': 'Trợ giảng',
             'lecturer': 'Giảng viên',
             'teacher': 'Giáo viên',
@@ -275,6 +280,10 @@ export class UserManagementComponent implements OnInit {
 
     public getAcademicDegreeDisplay(degree: string): string {
         const degrees: { [key: string]: string } = {
+            'KS': 'Kỹ sư',
+            'ThS': 'Thạc sĩ',
+            'TS': 'Tiến sĩ',
+            // Keep old values for backward compatibility
             'bachelor': 'Cử nhân',
             'master': 'Thạc sĩ',
             'doctor': 'Tiến sĩ',

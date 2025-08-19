@@ -241,8 +241,7 @@
         </h1>
         <div class="d-flex gap-2">
             <button type="button" class="btn btn-success" (click)="saveEvent()"
-                [disabled]="!completionStatus().isComplete || loading()"
-                [class.disabled]="!completionStatus().isComplete">
+                [disabled]="!eventForm.valid || loading()">
                 <i class="fas fa-save me-2"></i>
                 Lưu
             </button>
@@ -253,12 +252,12 @@
         </div>
     </div>
 
-    <!-- Completion Warning -->
+    <!-- Incomplete Assignment Information -->
     @if (!completionStatus().isComplete && (selectedUsers().length > 0 || selectedDuties().length > 0)) {
-    <div class="alert alert-warning d-flex">
-        <i class="fas fa-exclamation-triangle me-3 mt-1"></i>
+    <div class="alert alert-info d-flex">
+        <i class="fas fa-info-circle me-3 mt-1"></i>
         <div>
-            <h6 class="mb-2">Chưa hoàn thành phân công</h6>
+            <h6 class="mb-2">Thông tin phân công</h6>
             @if (completionStatus().unassignedUsers.length > 0) {
             <p class="mb-1 small">
                 <strong>Người dùng chưa được phân công:</strong>
@@ -271,6 +270,9 @@
                 {{ completionStatus().unassignedDutiesNames }}
             </p>
             }
+            <p class="mb-0 small text-muted mt-2">
+                <em>Bạn có thể lưu sự kiện mà không cần hoàn thành phân công. Phân công có thể được cập nhật sau.</em>
+            </p>
         </div>
     </div>
     }
