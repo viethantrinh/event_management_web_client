@@ -4,11 +4,12 @@ import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } 
 import { catchError, finalize, of } from 'rxjs';
 import { CreateUserRequest, UpdateUserRequest, UserResponse } from '../../models/user.model';
 import { UserService } from '../../services/user.service';
+import { UserReportComponent } from '../user-report/user-report.component';
 
 @Component({
     selector: 'app-user-management',
     standalone: true,
-    imports: [CommonModule, FormsModule, ReactiveFormsModule],
+    imports: [CommonModule, FormsModule, ReactiveFormsModule, UserReportComponent],
     templateUrl: './user-management.component.html',
     styleUrl: './user-management.component.css'
 })
@@ -32,6 +33,8 @@ export class UserManagementComponent implements OnInit {
     public showCreateModal = signal<boolean>(false);
     public editingUser = signal<UserResponse | null>(null);
     public deletingUser = signal<UserResponse | null>(null);
+    public showUserReport = signal<boolean>(false);
+    public selectedUserIdForReport = signal<string>('');
 
     // Forms
     public editForm: FormGroup;
@@ -385,5 +388,16 @@ export class UserManagementComponent implements OnInit {
                 roleNames: currentRoles.filter((r: string) => r !== role)
             });
         }
+    }
+
+    // User Report Methods
+    public openUserReport(userId: string): void {
+        this.selectedUserIdForReport.set(userId);
+        this.showUserReport.set(true);
+    }
+
+    public closeUserReport(): void {
+        this.showUserReport.set(false);
+        this.selectedUserIdForReport.set('');
     }
 }

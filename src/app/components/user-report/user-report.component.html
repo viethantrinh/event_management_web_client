@@ -1,0 +1,255 @@
+<!-- User Report Modal -->
+@if (isVisible) {
+<div class="modal d-block user-report-modal" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <!-- Modal Header -->
+            <div class="modal-header bg-primary text-white">
+                <h4 class="modal-title mb-0">
+                    <i class="fas fa-chart-line me-2"></i>
+                    BÁO CÁO CHI TIẾT THEO CÁ NHÂN
+                </h4>
+                <button type="button" class="btn-close btn-close-white" (click)="closeModal()"></button>
+            </div>
+
+            <!-- Modal Body -->
+            <div class="modal-body p-0">
+                @if (loading()) {
+                <!-- Loading State -->
+                <div class="text-center py-5">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Đang tải...</span>
+                    </div>
+                    <div class="mt-3">Đang tải báo cáo...</div>
+                </div>
+                } @else if (error()) {
+                <!-- Error State -->
+                <div class="alert alert-danger m-4">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    {{ error() }}
+                    <button class="btn btn-outline-danger btn-sm ms-3" (click)="loadUserReport()">
+                        <i class="fas fa-retry me-1"></i>Thử lại
+                    </button>
+                </div>
+                } @else if (userReport()) {
+                <!-- Report Content -->
+                <div class="report-content">
+                    <!-- Header Section -->
+                    <div class="report-header p-4 bg-light border-bottom">
+                        <div class="row g-3 align-items-center">
+                            <!-- Search -->
+                            <div class="col-md-6">
+                                <div class="input-group">
+                                    <span class="input-group-text">
+                                        <i class="fas fa-search"></i>
+                                    </span>
+                                    <input type="text" class="form-control"
+                                        placeholder="Nhập mã sinh viên hoặc tên để tìm kiếm" [value]="searchTerm()"
+                                        (input)="onSearch($any($event.target).value)">
+                                </div>
+                            </div>
+
+                            <!-- Action Buttons -->
+                            <div class="col-md-6 text-end">
+                                <button class="btn btn-outline-primary me-2" (click)="loadUserReport()">
+                                    <i class="fas fa-sync-alt me-1"></i>Tìm kiếm
+                                </button>
+                                <button class="btn btn-success" (click)="exportToPDF()">
+                                    <i class="fas fa-file-pdf me-1"></i>Xuất PDF
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Personal Information Card -->
+                    <div class="personal-info p-4">
+                        <div class="card border-0 shadow-sm">
+                            <div class="card-header bg-gradient-primary text-white">
+                                <h5 class="mb-0">
+                                    <i class="fas fa-user me-2"></i>Thông tin cá nhân
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <div class="info-item">
+                                            <label class="form-label fw-bold text-muted">Họ và tên:</label>
+                                            <div class="info-value">{{ userReport()!.fullName }}</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="info-item">
+                                            <label class="form-label fw-bold text-muted">Email:</label>
+                                            <div class="info-value">{{ userReport()!.email }}</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 col-sm-6">
+                                        <div class="info-item">
+                                            <label class="form-label fw-bold text-muted">Điện thoại:</label>
+                                            <div class="info-value">{{ userReport()!.phoneNumber }}</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 col-sm-6">
+                                        <div class="info-item">
+                                            <label class="form-label fw-bold text-muted">Tổng số sự kiện:</label>
+                                            <div class="info-value">
+                                                <span class="badge bg-info fs-6">
+                                                    <i class="fas fa-calendar-check me-1"></i>{{
+                                                    userReport()!.totalEvents }}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 col-sm-6">
+                                        <div class="info-item">
+                                            <label class="form-label fw-bold text-muted">Tổng điểm:</label>
+                                            <div class="info-value">
+                                                <span class="badge bg-success fs-6">
+                                                    <i class="fas fa-star me-1"></i>{{ userReport()!.totalScore }}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 col-sm-6">
+                                        <div class="info-item">
+                                            <label class="form-label fw-bold text-muted">Điểm trung bình:</label>
+                                            <div class="info-value">
+                                                <span class="badge bg-warning text-dark fs-6">
+                                                    <i class="fas fa-chart-line me-1"></i>{{ averageScore() }}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Events Table -->
+                    <div class="events-table p-4">
+                        <div class="card border-0 shadow-sm">
+                            <div class="card-header bg-warning text-dark">
+                                <h5 class="mb-0">
+                                    <i class="fas fa-calendar-alt me-2"></i>
+                                    Danh sách sự kiện đã tham gia
+                                    <span class="badge bg-dark ms-2">{{ filteredAndSortedEvents().length }}</span>
+                                </h5>
+                            </div>
+                            <div class="card-body p-0">
+                                @if (filteredAndSortedEvents().length === 0) {
+                                <div class="text-center py-5">
+                                    <i class="fas fa-calendar-times fa-3x text-muted mb-3"></i>
+                                    <p class="text-muted">Không có sự kiện nào được tìm thấy</p>
+                                </div>
+                                } @else {
+                                <!-- Desktop Table -->
+                                <div class="d-none d-lg-block">
+                                    <div class="table-responsive">
+                                        <table class="table table-hover mb-0 events-table-desktop">
+                                            <thead class="table-warning">
+                                                <tr>
+                                                    <th class="border-dark text-center"
+                                                        style="background-color: #FFD700; color: black; font-weight: bold;">
+                                                        STT</th>
+                                                    <th class="border-dark sortable"
+                                                        style="background-color: #FFD700; color: black; font-weight: bold;"
+                                                        (click)="onSort('eventName')">
+                                                        Tên sự kiện
+                                                        <i [class]="getSortIcon('eventName')" class="ms-1"></i>
+                                                    </th>
+                                                    <th class="border-dark sortable"
+                                                        style="background-color: #FFD700; color: black; font-weight: bold;"
+                                                        (click)="onSort('startDate')">
+                                                        Thời gian
+                                                        <i [class]="getSortIcon('startDate')" class="ms-1"></i>
+                                                    </th>
+                                                    <th class="border-dark"
+                                                        style="background-color: #FFD700; color: black; font-weight: bold;">
+                                                        Nhiệm vụ</th>
+                                                    <th class="border-dark sortable text-center"
+                                                        style="background-color: #FFD700; color: black; font-weight: bold;"
+                                                        (click)="onSort('score')">
+                                                        Điểm số
+                                                        <i [class]="getSortIcon('score')" class="ms-1"></i>
+                                                    </th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @for (event of filteredAndSortedEvents(); track event.eventId; let i =
+                                                $index) {
+                                                <tr [class]="i % 2 === 0 ? 'table-light' : ''">
+                                                    <td class="border-dark text-center">{{ i + 1 }}</td>
+                                                    <td class="border-dark">
+                                                        <div class="fw-bold">{{ event.eventName }}</div>
+                                                        <small class="text-muted">{{ event.eventDescription }}</small>
+                                                    </td>
+                                                    <td class="border-dark">{{ formatDateRange(event.startDate,
+                                                        event.endDate) }}</td>
+                                                    <td class="border-dark">
+                                                        <div>{{ event.dutyName }}</div>
+                                                        <small class="text-muted">{{ event.dutyDescription }}</small>
+                                                    </td>
+                                                    <td class="border-dark text-center">
+                                                        <span class="badge"
+                                                            [class]="event.score >= 15 ? 'bg-success' : event.score >= 10 ? 'bg-warning text-dark' : 'bg-secondary'">
+                                                            {{ event.score }}
+                                                        </span>
+                                                    </td>
+                                                </tr>
+                                                }
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+
+                                <!-- Mobile Cards -->
+                                <div class="d-lg-none p-3">
+                                    @for (event of filteredAndSortedEvents(); track event.eventId; let i = $index) {
+                                    <div class="card mb-3 border">
+                                        <div class="card-body">
+                                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                                <span class="badge bg-primary">#{{ i + 1 }}</span>
+                                                <span class="badge"
+                                                    [class]="event.score >= 15 ? 'bg-success' : event.score >= 10 ? 'bg-warning text-dark' : 'bg-secondary'">
+                                                    {{ event.score }} điểm
+                                                </span>
+                                            </div>
+                                            <h6 class="card-title">{{ event.eventName }}</h6>
+                                            <p class="card-text small text-muted mb-2">{{ event.eventDescription }}</p>
+                                            <div class="row g-2 small">
+                                                <div class="col-6">
+                                                    <strong>Thời gian:</strong><br>
+                                                    {{ formatDateRange(event.startDate, event.endDate) }}
+                                                </div>
+                                                <div class="col-6">
+                                                    <strong>Nhiệm vụ:</strong><br>
+                                                    {{ event.dutyName }}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    }
+                                </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                }
+            </div>
+
+            <!-- Modal Footer -->
+            @if (!loading() && !error()) {
+            <div class="modal-footer bg-light">
+                <button type="button" class="btn btn-secondary" (click)="closeModal()">
+                    <i class="fas fa-times me-1"></i>Đóng
+                </button>
+                <button type="button" class="btn btn-primary" (click)="exportToPDF()">
+                    <i class="fas fa-print me-1"></i>In báo cáo
+                </button>
+            </div>
+            }
+        </div>
+    </div>
+</div>
+}

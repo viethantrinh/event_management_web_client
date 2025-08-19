@@ -152,12 +152,18 @@
                                         </td>
                                         <td class="text-center">
                                             <div class="btn-group" role="group">
+                                                <button type="button" class="btn btn-sm btn-outline-info"
+                                                    (click)="openUserReport(user.id)" [disabled]="loading()"
+                                                    title="Báo cáo cá nhân">
+                                                    <i class="fas fa-chart-line"></i>
+                                                </button>
                                                 <button type="button" class="btn btn-sm btn-outline-primary"
-                                                    (click)="openEditModal(user)" [disabled]="loading()">
+                                                    (click)="openEditModal(user)" [disabled]="loading()"
+                                                    title="Chỉnh sửa">
                                                     <i class="fas fa-edit"></i>
                                                 </button>
                                                 <button type="button" class="btn btn-sm btn-outline-danger"
-                                                    (click)="openDeleteModal(user)" [disabled]="loading()">
+                                                    (click)="openDeleteModal(user)" [disabled]="loading()" title="Xóa">
                                                     <i class="fas fa-trash"></i>
                                                 </button>
                                             </div>
@@ -191,11 +197,16 @@
                                         </div>
                                     </div>
                                     <div class="btn-group">
+                                        <button class="btn btn-sm btn-outline-info me-1"
+                                            (click)="openUserReport(user.id)" title="Báo cáo cá nhân">
+                                            <i class="fas fa-chart-line"></i>
+                                        </button>
                                         <button class="btn btn-sm btn-outline-primary me-1"
-                                            (click)="openEditModal(user)">
+                                            (click)="openEditModal(user)" title="Chỉnh sửa">
                                             <i class="fas fa-edit"></i>
                                         </button>
-                                        <button class="btn btn-sm btn-outline-danger" (click)="openDeleteModal(user)">
+                                        <button class="btn btn-sm btn-outline-danger" (click)="openDeleteModal(user)"
+                                            title="Xóa">
                                             <i class="fas fa-trash"></i>
                                         </button>
                                     </div>
@@ -755,3 +766,6 @@
     </div>
 </div>
 }
+<!-- User Report Modal -->
+<app-user-report [userId]="selectedUserIdForReport()" [isVisible]="showUserReport()" (onClose)="closeUserReport()">
+</app-user-report>
