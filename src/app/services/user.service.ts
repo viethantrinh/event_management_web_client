@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { map, Observable } from 'rxjs';
 import { ApiResponse } from '../models/base.model';
-import { UpdateUserRequest, UserResponse } from '../models/user.model';
+import { CreateUserRequest, UpdateUserRequest, UserResponse } from '../models/user.model';
 import { BASE_API_URL } from '../utils/app.constants';
 
 @Injectable({
@@ -29,6 +29,13 @@ export class UserService {
     return this.http.get<ApiResponse<UserResponse[]>>(this.baseUserUrl)
       .pipe(
         map(response => response.result || [])
+      );
+  }
+
+  public createUserApi(request: CreateUserRequest): Observable<UserResponse | undefined> {
+    return this.http.post<ApiResponse<UserResponse>>(this.baseUserUrl, request)
+      .pipe(
+        map(response => response.result)
       );
   }
 

@@ -11,6 +11,17 @@ export interface UserResponse {
   roles: RoleResponse[];
 }
 
+export interface CreateUserRequest {
+  email: string;
+  workEmail?: string;
+  password: string;
+  fullName: string;
+  phoneNumber: string;
+  academicRank: string;
+  academicDegree: string;
+  roleNames: string[];
+}
+
 export interface UpdateUserRequest {
   email: string;
   workEmail?: string;

@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { catchError, finalize, of } from 'rxjs';
-import { UpdateUserRequest, UserResponse } from '../../models/user.model';
+import { CreateUserRequest, UpdateUserRequest, UserResponse } from '../../models/user.model';
 import { UserService } from '../../services/user.service';
 
 @Component({
@@ -29,11 +29,13 @@ export class UserManagementComponent implements OnInit {
     public selectedAcademicDegree = signal<string>('');
     public showEditModal = signal<boolean>(false);
     public showDeleteModal = signal<boolean>(false);
+    public showCreateModal = signal<boolean>(false);
     public editingUser = signal<UserResponse | null>(null);
     public deletingUser = signal<UserResponse | null>(null);
 
-    // Form
+    // Forms
     public editForm: FormGroup;
+    public createForm: FormGroup;
 
     // Constants
     public readonly roles = ['USER', 'ADMIN'];
@@ -109,6 +111,17 @@ export class UserManagementComponent implements OnInit {
         this.editForm = this.fb.group({
             email: ['', [Validators.required, Validators.email]],
             workEmail: ['', [Validators.email]],
+            fullName: ['', [Validators.required]],
+            phoneNumber: ['', [Validators.required]],
+            academicRank: ['', [Validators.required]],
+            academicDegree: ['', [Validators.required]],
+            roleNames: [[], [Validators.required]]
+        });
+
+        this.createForm = this.fb.group({
+            email: ['', [Validators.required, Validators.email]],
+            workEmail: ['', [Validators.email]],
+            password: ['', [Validators.required, Validators.minLength(8)]],
             fullName: ['', [Validators.required]],
             phoneNumber: ['', [Validators.required]],
             academicRank: ['', [Validators.required]],
@@ -250,6 +263,54 @@ export class UserManagementComponent implements OnInit {
         }
     }
 
+    // Create User Methods
+    public openCreateModal(): void {
+        this.createForm.reset();
+        this.showCreateModal.set(true);
+        console.log('in open create modal', `showCreateModal: ${this.showCreateModal()}`);
+
+    }
+
+    public closeCreateModal(): void {
+        this.showCreateModal.set(false);
+        this.createForm.reset();
+    }
+
+    public onCreateUser(): void {
+        if (this.createForm.valid) {
+            this.loading.set(true);
+            const formValue = this.createForm.value;
+
+            const createRequest: CreateUserRequest = {
+                email: formValue.email,
+                workEmail: formValue.workEmail,
+                password: formValue.password,
+                fullName: formValue.fullName,
+                phoneNumber: formValue.phoneNumber,
+                academicRank: formValue.academicRank,
+                academicDegree: formValue.academicDegree,
+                roleNames: formValue.roleNames
+            };
+
+            this.userService.createUserApi(createRequest)
+                .pipe(
+                    catchError(error => {
+                        console.error('Error creating user:', error);
+                        alert('Có lỗi xảy ra khi tạo người dùng');
+                        return of(undefined);
+                    }),
+                    finalize(() => this.loading.set(false))
+                )
+                .subscribe(newUser => {
+                    if (newUser) {
+                        this.users.set([...this.users(), newUser]);
+                        this.closeCreateModal();
+                        alert('Tạo người dùng thành công');
+                    }
+                });
+        }
+    }
+
     public clearFilters(): void {
         this.searchTerm.set('');
         this.selectedRole.set('');
@@ -304,6 +365,23 @@ export class UserManagementComponent implements OnInit {
             }
         } else {
             this.editForm.patchValue({
+                roleNames: currentRoles.filter((r: string) => r !== role)
+            });
+        }
+    }
+
+    public onCreateRoleChange(role: string, event: Event): void {
+        const checkbox = event.target as HTMLInputElement;
+        const currentRoles = this.createForm.get('roleNames')?.value || [];
+
+        if (checkbox.checked) {
+            if (!currentRoles.includes(role)) {
+                this.createForm.patchValue({
+                    roleNames: [...currentRoles, role]
+                });
+            }
+        } else {
+            this.createForm.patchValue({
                 roleNames: currentRoles.filter((r: string) => r !== role)
             });
         }
