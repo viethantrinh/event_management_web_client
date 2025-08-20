@@ -70,4 +70,53 @@
             </div>
         </div>
     </div>
+
+    <!-- Reports Section -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-chart-pie me-2"></i>Báo cáo hệ thống
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <button class="btn btn-primary w-100 btn-lg" (click)="openOverviewReport()">
+                                <i class="fas fa-chart-bar me-2"></i>
+                                <div>
+                                    <div class="fw-bold">Báo cáo tổng thể</div>
+                                    <small class="d-block opacity-75">Xem thống kê toàn hệ thống</small>
+                                </div>
+                            </button>
+                        </div>
+                        <div class="col-md-4">
+                            <button class="btn btn-success w-100 btn-lg" disabled>
+                                <i class="fas fa-file-export me-2"></i>
+                                <div>
+                                    <div class="fw-bold">Xuất báo cáo định kỳ</div>
+                                    <small class="d-block opacity-75">Sắp ra mắt</small>
+                                </div>
+                            </button>
+                        </div>
+                        <div class="col-md-4">
+                            <button class="btn btn-info w-100 btn-lg" disabled>
+                                <i class="fas fa-chart-pie me-2"></i>
+                                <div>
+                                    <div class="fw-bold">Phân tích xu hướng</div>
+                                    <small class="d-block opacity-75">Sắp ra mắt</small>
+                                </div>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+
+<!-- Overview Report Modal -->
+@if (showOverviewReport()) {
+<app-overview-report [isVisible]="showOverviewReport()" (close)="closeOverviewReport()"></app-overview-report>
+}

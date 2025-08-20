@@ -52,3 +52,20 @@ export interface EventReportApiResponse {
     timestamp: string;
     result: EventReportResponse;
 }
+
+// Overview Report Models
+export interface OverviewReportUser {
+    sequenceNumber: number;
+    fullName: string;
+    department: string;
+    degree: string;
+    totalEventsParticipated: number;
+    totalScore: number;
+}
+
+export interface OverviewReportApiResponse {
+    code: number;
+    message: string;
+    timestamp: string;
+    result: OverviewReportUser[];
+}

@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, map } from 'rxjs';
-import { EventReportApiResponse, EventReportResponse, UserReportApiResponse, UserReportResponse } from '../models/report.model';
+import { EventReportApiResponse, EventReportResponse, OverviewReportApiResponse, OverviewReportUser, UserReportApiResponse, UserReportResponse } from '../models/report.model';
 import { BASE_API_URL } from '../utils/app.constants';
 
 @Injectable({
@@ -20,6 +20,13 @@ export class ReportService {
 
     getEventReport(eventId: number): Observable<EventReportResponse> {
         return this.http.get<EventReportApiResponse>(`${BASE_API_URL}/reports/event/${eventId}`)
+            .pipe(
+                map(response => response.result)
+            );
+    }
+
+    getOverviewReport(): Observable<OverviewReportUser[]> {
+        return this.http.get<OverviewReportApiResponse>(`${BASE_API_URL}/reports/overview`)
             .pipe(
                 map(response => response.result)
             );

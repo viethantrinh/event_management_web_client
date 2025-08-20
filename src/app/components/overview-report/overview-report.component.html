@@ -1,0 +1,382 @@
+<!-- Overview Report Modal -->
+@if (isVisible) {
+<div class="modal d-block overview-report-modal" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
+    <div class="modal-dialog modal-fullscreen">
+        <div class="modal-content">
+            <!-- Modal Header -->
+            <div class="modal-header bg-primary text-white">
+                <h4 class="modal-title mb-0 text-center w-100" style="font-size: 24px; font-weight: bold;">
+                    <i class="fas fa-chart-pie me-2"></i>
+                    Báo cáo tổng thể
+                </h4>
+                <button type="button" class="btn-close btn-close-white" (click)="closeModal()"></button>
+            </div>
+
+            <!-- Modal Body -->
+            <div class="modal-body p-0">
+                @if (loading()) {
+                <!-- Loading State -->
+                <div class="text-center py-5">
+                    <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;">
+                        <span class="visually-hidden">Đang tải...</span>
+                    </div>
+                    <div class="mt-3 h5">Đang tải báo cáo tổng thể...</div>
+                    <!-- Skeleton Loading Table -->
+                    <div class="container mt-4">
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        @for (i of [1,2,3,4,5,6]; track i) {
+                                        <th>
+                                            <div class="skeleton-line" style="height: 20px;"></div>
+                                        </th>
+                                        }
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @for (row of [1,2,3,4,5]; track row) {
+                                    <tr>
+                                        @for (col of [1,2,3,4,5,6]; track col) {
+                                        <td>
+                                            <div class="skeleton-line" style="height: 16px;"></div>
+                                        </td>
+                                        }
+                                    </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                } @else if (error()) {
+                <!-- Error State -->
+                <div class="alert alert-danger m-4">
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-exclamation-triangle fa-2x me-3"></i>
+                        <div>
+                            <h5 class="alert-heading">Lỗi tải dữ liệu</h5>
+                            <p class="mb-0">{{ error() }}</p>
+                        </div>
+                    </div>
+                    <hr>
+                    <button class="btn btn-outline-danger" (click)="loadOverviewReport()">
+                        <i class="fas fa-retry me-1"></i>Thử lại
+                    </button>
+                </div>
+                } @else {
+                <!-- Report Content -->
+                <div class="report-content">
+                    <!-- Header Section with Controls -->
+                    <div class="report-header p-4 bg-light border-bottom">
+                        <div class="row g-3 align-items-end">
+                            <!-- Search -->
+                            <div class="col-md-4">
+                                <label class="form-label">Tìm kiếm theo tên hoặc học hàm</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">
+                                        <i class="fas fa-search"></i>
+                                    </span>
+                                    <input type="text" class="form-control" placeholder="Nhập tên hoặc học hàm..."
+                                        [value]="searchTerm()" (input)="onSearchInput($event)">
+                                </div>
+                            </div>
+
+                            <!-- Department Filter -->
+                            <div class="col-md-2">
+                                <label class="form-label">Học hàm</label>
+                                <select class="form-select" [value]="departmentFilter()"
+                                    (change)="onDepartmentFilter($any($event.target).value)">
+                                    <option value="">Tất cả</option>
+                                    @for (dept of uniqueDepartments(); track dept) {
+                                    <option [value]="dept">{{ dept }}</option>
+                                    }
+                                </select>
+                            </div>
+
+                            <!-- Degree Filter -->
+                            <div class="col-md-2">
+                                <label class="form-label">Học vị</label>
+                                <select class="form-select" [value]="degreeFilter()"
+                                    (change)="onDegreeFilter($any($event.target).value)">
+                                    <option value="">Tất cả</option>
+                                    @for (degree of uniqueDegrees(); track degree) {
+                                    <option [value]="degree">{{ degree }}</option>
+                                    }
+                                </select>
+                            </div>
+
+                            <!-- Action Buttons -->
+                            <div class="col-md-4 text-end">
+                                <button class="btn btn-outline-secondary me-2" (click)="clearFilters()">
+                                    <i class="fas fa-times me-1"></i>Xóa bộ lọc
+                                </button>
+                                <button class="btn btn-outline-primary me-2" (click)="loadOverviewReport()">
+                                    <i class="fas fa-sync-alt me-1"></i>Làm mới dữ liệu
+                                </button>
+                                <button class="btn btn-success" (click)="exportToExcel()">
+                                    <i class="fas fa-file-excel me-1"></i>Xuất Excel
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Statistics Cards -->
+                    <div class="statistics-section p-4 bg-light">
+                        <div class="row g-3">
+                            <div class="col-md-2">
+                                <div class="card border-0 shadow-sm h-100">
+                                    <div class="card-body text-center">
+                                        <div class="text-primary mb-2">
+                                            <i class="fas fa-users fa-2x"></i>
+                                        </div>
+                                        <h5 class="card-title mb-1">{{ statistics().totalUsers }}</h5>
+                                        <p class="card-text text-muted small">Tổng người dùng</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <div class="card border-0 shadow-sm h-100">
+                                    <div class="card-body text-center">
+                                        <div class="text-success mb-2">
+                                            <i class="fas fa-star fa-2x"></i>
+                                        </div>
+                                        <h5 class="card-title mb-1">{{ statistics().averageScore }}</h5>
+                                        <p class="card-text text-muted small">Điểm trung bình</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <div class="card border-0 shadow-sm h-100">
+                                    <div class="card-body text-center">
+                                        <div class="text-warning mb-2">
+                                            <i class="fas fa-trophy fa-2x"></i>
+                                        </div>
+                                        <h5 class="card-title mb-1">{{ statistics().highestScore }}</h5>
+                                        <p class="card-text text-muted small">Điểm cao nhất</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <div class="card border-0 shadow-sm h-100">
+                                    <div class="card-body text-center">
+                                        <div class="text-info mb-2">
+                                            <i class="fas fa-chart-line fa-2x"></i>
+                                        </div>
+                                        <h5 class="card-title mb-1">{{ statistics().lowestScore }}</h5>
+                                        <p class="card-text text-muted small">Điểm thấp nhất</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <div class="card border-0 shadow-sm h-100">
+                                    <div class="card-body text-center">
+                                        <div class="text-primary mb-2">
+                                            <i class="fas fa-calendar-check fa-2x"></i>
+                                        </div>
+                                        <h5 class="card-title mb-1">{{ statistics().totalEvents }}</h5>
+                                        <p class="card-text text-muted small">Tổng lượt tham gia</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <div class="card border-0 shadow-sm h-100">
+                                    <div class="card-body text-center">
+                                        <div class="text-secondary mb-2">
+                                            <i class="fas fa-percentage fa-2x"></i>
+                                        </div>
+                                        <h5 class="card-title mb-1">{{ filteredData().length }}</h5>
+                                        <p class="card-text text-muted small">Đang hiển thị</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Main Data Table -->
+                    <div class="table-section p-4">
+                        @if (sortedData().length === 0) {
+                        <!-- Empty State -->
+                        <div class="text-center py-5">
+                            <i class="fas fa-inbox fa-4x text-muted mb-4"></i>
+                            <h4 class="text-muted">Không có dữ liệu</h4>
+                            <p class="text-muted">Không tìm thấy dữ liệu phù hợp với bộ lọc hiện tại.</p>
+                            <button class="btn btn-primary" (click)="clearFilters()">
+                                <i class="fas fa-refresh me-1"></i>Xóa bộ lọc
+                            </button>
+                        </div>
+                        } @else {
+                        <!-- Desktop Table -->
+                        <div class="d-none d-lg-block">
+                            <div class="table-responsive">
+                                <table class="table overview-table mb-0">
+                                    <thead>
+                                        <tr style="height: 50px;">
+                                            <th class="border-dark text-center sortable"
+                                                style="background-color: #FFD700; color: black; font-weight: bold; width: 10%;"
+                                                (click)="onSort('sequenceNumber')">
+                                                Số thứ tự
+                                                <i [class]="getSortIcon('sequenceNumber')" class="ms-1"></i>
+                                            </th>
+                                            <th class="border-dark sortable"
+                                                style="background-color: #FFD700; color: black; font-weight: bold; width: 25%;"
+                                                (click)="onSort('fullName')">
+                                                Họ và tên
+                                                <i [class]="getSortIcon('fullName')" class="ms-1"></i>
+                                            </th>
+                                            <th class="border-dark text-center sortable"
+                                                style="background-color: #FFD700; color: black; font-weight: bold; width: 20%;"
+                                                (click)="onSort('department')">
+                                                Học hàm
+                                                <i [class]="getSortIcon('department')" class="ms-1"></i>
+                                            </th>
+                                            <th class="border-dark text-center sortable"
+                                                style="background-color: #FFD700; color: black; font-weight: bold; width: 15%;"
+                                                (click)="onSort('degree')">
+                                                Học vị
+                                                <i [class]="getSortIcon('degree')" class="ms-1"></i>
+                                            </th>
+                                            <th class="border-dark text-center sortable"
+                                                style="background-color: #FFD700; color: black; font-weight: bold; width: 20%;"
+                                                (click)="onSort('totalEventsParticipated')">
+                                                Tổng số sự kiện đã tham gia
+                                                <i [class]="getSortIcon('totalEventsParticipated')" class="ms-1"></i>
+                                            </th>
+                                            <th class="border-dark text-center sortable"
+                                                style="background-color: #FFD700; color: black; font-weight: bold; width: 10%;"
+                                                (click)="onSort('totalScore')">
+                                                Tổng số điểm
+                                                <i [class]="getSortIcon('totalScore')" class="ms-1"></i>
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @for (user of paginatedData(); track user.sequenceNumber; let i = $index) {
+                                        <tr [class]="i % 2 === 0 ? 'table-white' : 'table-gray'">
+                                            <td class="border-dark text-center">{{ user.sequenceNumber }}</td>
+                                            <td class="border-dark">{{ user.fullName }}</td>
+                                            <td class="border-dark text-center">{{ user.department || '-' }}</td>
+                                            <td class="border-dark text-center">{{ user.degree || '-' }}</td>
+                                            <td class="border-dark text-center">{{ user.totalEventsParticipated }}</td>
+                                            <td class="border-dark text-center">
+                                                <span class="badge"
+                                                    [class]="user.totalScore >= 50 ? 'bg-success' : user.totalScore >= 30 ? 'bg-warning text-dark' : user.totalScore > 0 ? 'bg-info' : 'bg-secondary'">
+                                                    {{ user.totalScore }}
+                                                </span>
+                                            </td>
+                                        </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Mobile/Tablet Cards -->
+                        <div class="d-lg-none">
+                            @for (user of paginatedData(); track user.sequenceNumber) {
+                            <div class="card mb-3 user-card">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                        <h6 class="card-title mb-0">{{ user.fullName }}</h6>
+                                        <span class="badge"
+                                            [class]="user.totalScore >= 50 ? 'bg-success' : user.totalScore >= 30 ? 'bg-warning text-dark' : user.totalScore > 0 ? 'bg-info' : 'bg-secondary'">
+                                            {{ user.totalScore }} điểm
+                                        </span>
+                                    </div>
+                                    <div class="row g-2 small">
+                                        <div class="col-6">
+                                            <strong>STT:</strong> {{ user.sequenceNumber }}
+                                        </div>
+                                        <div class="col-6">
+                                            <strong>Học hàm:</strong> {{ user.department || '-' }}
+                                        </div>
+                                        <div class="col-6">
+                                            <strong>Học vị:</strong> {{ user.degree || '-' }}
+                                        </div>
+                                        <div class="col-6">
+                                            <strong>Sự kiện:</strong> {{ user.totalEventsParticipated }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            }
+                        </div>
+
+                        <!-- Pagination -->
+                        @if (totalPages() > 1) {
+                        <nav class="mt-4">
+                            <ul class="pagination justify-content-center">
+                                <li class="page-item" [class.disabled]="currentPage() === 1">
+                                    <a class="page-link" href="javascript:void(0)"
+                                        (click)="goToPage(currentPage() - 1)">
+                                        <i class="fas fa-chevron-left"></i>
+                                    </a>
+                                </li>
+
+                                @for (page of pageNumbers(); track page) {
+                                <li class="page-item" [class.active]="currentPage() === page">
+                                    <a class="page-link" href="javascript:void(0)" (click)="goToPage(page)">
+                                        {{ page }}
+                                    </a>
+                                </li>
+                                }
+
+                                <li class="page-item" [class.disabled]="currentPage() === totalPages()">
+                                    <a class="page-link" href="javascript:void(0)"
+                                        (click)="goToPage(currentPage() + 1)">
+                                        <i class="fas fa-chevron-right"></i>
+                                    </a>
+                                </li>
+                            </ul>
+                        </nav>
+                        }
+                        }
+                    </div>
+
+                    <!-- Additional Statistics -->
+                    @if (statistics().highestScorer && statistics().lowestScorer) {
+                    <div class="additional-stats p-4 bg-light border-top">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="alert alert-success">
+                                    <h6 class="alert-heading">
+                                        <i class="fas fa-trophy me-2"></i>Điểm cao nhất
+                                    </h6>
+                                    <p class="mb-0">{{ statistics().highestScorer }} với {{ statistics().highestScore }}
+                                        điểm</p>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="alert alert-info">
+                                    <h6 class="alert-heading">
+                                        <i class="fas fa-chart-line me-2"></i>Điểm thấp nhất
+                                    </h6>
+                                    <p class="mb-0">{{ statistics().lowestScorer }} với {{ statistics().lowestScore }}
+                                        điểm</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    }
+                </div>
+                }
+            </div>
+
+            <!-- Modal Footer -->
+            @if (!loading() && !error()) {
+            <div class="modal-footer bg-light">
+                <button type="button" class="btn btn-secondary" (click)="closeModal()">
+                    <i class="fas fa-times me-1"></i>Đóng
+                </button>
+                <button type="button" class="btn btn-primary" (click)="exportToPDF()">
+                    <i class="fas fa-print me-1"></i>Xuất PDF
+                </button>
+                <button type="button" class="btn btn-success" (click)="exportToExcel()">
+                    <i class="fas fa-file-excel me-1"></i>Xuất Excel
+                </button>
+            </div>
+            }
+        </div>
+    </div>
+</div>
+}
