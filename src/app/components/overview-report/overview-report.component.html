@@ -1,7 +1,8 @@
 <!-- Overview Report Modal -->
 @if (isVisible) {
-<div class="modal d-block overview-report-modal" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
-    <div class="modal-dialog modal-fullscreen">
+<div class="modal d-block overview-report-modal" tabindex="-1" style="background-color: rgba(0,0,0,0.5);"
+    (click)="onBackdropClick($event)">
+    <div class="modal-dialog modal-fullscreen" (click)="$event.stopPropagation()">
         <div class="modal-content">
             <!-- Modal Header -->
             <div class="modal-header bg-primary text-white">
@@ -368,9 +369,9 @@
                 <button type="button" class="btn btn-secondary" (click)="closeModal()">
                     <i class="fas fa-times me-1"></i>Đóng
                 </button>
-                <button type="button" class="btn btn-primary" (click)="exportToPDF()">
+                <!-- <button type="button" class="btn btn-primary" (click)="exportToPDF()">
                     <i class="fas fa-print me-1"></i>Xuất PDF
-                </button>
+                </button> -->
                 <button type="button" class="btn btn-success" (click)="exportToExcel()">
                     <i class="fas fa-file-excel me-1"></i>Xuất Excel
                 </button>

@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, EventEmitter, inject, Input, OnChanges, OnInit, Output, signal, SimpleChanges } from '@angular/core';
+import { Component, computed, EventEmitter, HostListener, inject, Input, OnChanges, OnInit, Output, signal, SimpleChanges } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { catchError, debounceTime, distinctUntilChanged, finalize, of, Subject } from 'rxjs';
 import * as XLSX from 'xlsx';
@@ -17,7 +17,7 @@ type SortableColumn = 'sequenceNumber' | 'fullName' | 'department' | 'degree' | 
 })
 export class OverviewReportComponent implements OnInit, OnChanges {
     @Input() isVisible: boolean = false;
-    @Output() onClose = new EventEmitter<void>();
+    @Output() close = new EventEmitter<void>(); // Đổi từ onClose thành close
 
     private readonly reportService = inject(ReportService);
     private searchSubject = new Subject<string>();
@@ -207,8 +207,21 @@ export class OverviewReportComponent implements OnInit, OnChanges {
     }
 
     public closeModal(): void {
-        this.onClose.emit();
+        this.close.emit(); // Đổi từ onClose thành close
         this.resetComponent();
+    }
+
+    public onBackdropClick(event: Event): void {
+        // Đóng modal khi click vào backdrop (vùng ngoài modal)
+        this.closeModal();
+    }
+
+    @HostListener('document:keydown', ['$event'])
+    public onEscapeKey(event: KeyboardEvent): void {
+        if (this.isVisible && event.key === 'Escape') {
+            event.preventDefault();
+            this.closeModal();
+        }
     }
 
     private resetComponent(): void {
