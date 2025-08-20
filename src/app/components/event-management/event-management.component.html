@@ -384,7 +384,7 @@
                         <i class="fas fa-users me-2 text-success"></i>
                         Phân công nhiệm vụ ({{ selectedUsers().length }} người dùng)
                     </h5>
-                    <button type="button" class="btn btn-success btn-sm" (click)="showUserModal.set(true)">
+                    <button type="button" class="btn btn-success btn-sm" (click)="openUserModal()">
                         <i class="fas fa-plus me-1"></i>
                         Thêm người dùng
                     </button>
@@ -599,8 +599,10 @@
             </div>
             <div class="modal-body">
                 <div class="mb-3">
-                    <input type="text" class="form-control" placeholder="Tìm kiếm người dùng..."
-                        [value]="userSearchTerm()" (input)="userSearchTerm.set($any($event.target).value)">
+                    <input type="text" class="form-control"
+                        placeholder="Tìm kiếm người dùng theo tên, học hàm, học vị..." [value]="userSearchTerm()"
+                        (input)="onUserSearch($event)" (keyup)="onUserSearch($event)">
+                    <small class="text-muted">Đã tìm thấy {{ filteredUsers().length }} người dùng</small>
                 </div>
 
                 <div class="row g-2">

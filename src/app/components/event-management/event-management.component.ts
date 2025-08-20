@@ -126,12 +126,34 @@ export class EventManagementComponent implements OnInit {
     });
 
     public filteredUsers = computed(() => {
-        const search = this.userSearchTerm().toLowerCase();
-        return this.users().filter(user =>
-            !this.selectedUsers().includes(user.id) &&
-            (user.fullName.toLowerCase().includes(search) ||
-                user.academicRank.toLowerCase().includes(search))
-        );
+        const search = this.userSearchTerm().toLowerCase().trim();
+        const allUsers = this.users();
+        const selectedUserIds = this.selectedUsers();
+
+        if (!allUsers || allUsers.length === 0) {
+            return [];
+        }
+
+        return allUsers.filter(user => {
+            // Loại bỏ users đã được chọn
+            if (selectedUserIds.includes(user.id)) {
+                return false;
+            }
+
+            // Nếu không có search term, hiển thị tất cả users chưa được chọn
+            if (search === '') {
+                return true;
+            }
+
+            // Tìm kiếm trong tên, học hàm, học vị
+            const fullName = (user.fullName || '').toLowerCase();
+            const academicRank = (user.academicRank || '').toLowerCase();
+            const academicDegree = (user.academicDegree || '').toLowerCase();
+
+            return fullName.includes(search) ||
+                academicRank.includes(search) ||
+                academicDegree.includes(search);
+        });
     });
 
     public completionStatus = computed(() => {
@@ -411,6 +433,16 @@ export class EventManagementComponent implements OnInit {
     }
 
     // User management methods
+    public openUserModal(): void {
+        this.userSearchTerm.set(''); // Reset search khi mở modal
+        this.showUserModal.set(true);
+    }
+
+    public onUserSearch(event: any): void {
+        const searchValue = event.target.value || '';
+        this.userSearchTerm.set(searchValue);
+    }
+
     public addUserToEvent(userId: string): void {
         if (!this.selectedUsers().includes(userId)) {
             this.selectedUsers.set([...this.selectedUsers(), userId]);
