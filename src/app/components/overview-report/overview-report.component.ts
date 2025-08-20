@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, computed, EventEmitter, inject, Input, OnChanges, OnInit, Output, signal, SimpleChanges } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { catchError, debounceTime, distinctUntilChanged, finalize, of, Subject } from 'rxjs';
+import * as XLSX from 'xlsx';
 import { OverviewReportUser } from '../../models/report.model';
 import { ReportService } from '../../services/report.service';
 
@@ -264,32 +265,113 @@ export class OverviewReportComponent implements OnInit, OnChanges {
     }
 
     public exportToExcel(): void {
-        // Implement Excel export functionality
-        const data = this.sortedData();
-        const headers = ['Số thứ tự', 'Họ và tên', 'Học hàm', 'Học vị', 'Tổng số sự kiện đã tham gia', 'Tổng số điểm'];
+        // Hiển thị loading cho việc xuất Excel
+        const originalLoading = this.loading();
+        this.loading.set(true);
 
-        let csvContent = headers.join(',') + '\n';
-        data.forEach(user => {
-            const row = [
-                user.sequenceNumber,
-                `"${user.fullName}"`,
-                `"${user.department}"`,
-                `"${user.degree}"`,
-                user.totalEventsParticipated,
-                user.totalScore
-            ];
-            csvContent += row.join(',') + '\n';
+        // Gọi API để lấy TOÀN BỘ dữ liệu (không filter, không phân trang)
+        this.reportService.getOverviewReport()
+            .pipe(
+                catchError(error => {
+                    console.error('Error exporting Excel:', error);
+                    this.error.set('Không thể xuất file Excel. Vui lòng thử lại.');
+                    return of([]);
+                }),
+                finalize(() => this.loading.set(originalLoading))
+            )
+            .subscribe(allData => {
+                if (allData.length === 0) {
+                    this.error.set('Không có dữ liệu để xuất Excel');
+                    return;
+                }
+
+                this.generateSimpleExcelFile(allData);
+            });
+    }
+
+    private generateSimpleExcelFile(allData: OverviewReportUser[]): void {
+        // Tạo data theo định dạng đơn giản như CSV
+        const worksheetData = [
+            ['Số thứ tự', 'Họ và tên', 'Học hàm', 'Học vị', 'Tổng số sự kiện đã tham gia', 'Tổng số điểm']
+        ];
+
+        // Thêm toàn bộ dữ liệu người dùng (sắp xếp theo sequenceNumber)
+        const sortedData = [...allData].sort((a, b) => a.sequenceNumber - b.sequenceNumber);
+
+        sortedData.forEach(user => {
+            worksheetData.push([
+                user.sequenceNumber.toString(),
+                user.fullName || '',
+                user.department || '',
+                user.degree || '',
+                user.totalEventsParticipated.toString(),
+                user.totalScore.toString()
+            ]);
         });
 
-        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-        const link = document.createElement('a');
-        const url = URL.createObjectURL(blob);
-        link.setAttribute('href', url);
-        link.setAttribute('download', `bao-cao-tong-the-${new Date().toISOString().split('T')[0]}.csv`);
-        link.style.visibility = 'hidden';
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
+        // Tạo workbook và worksheet
+        const workbook = XLSX.utils.book_new();
+        const worksheet = XLSX.utils.aoa_to_sheet(worksheetData);
+
+        // Thiết lập độ rộng cột
+        const columnWidths = [
+            { wch: 12 }, // Số thứ tự
+            { wch: 25 }, // Họ và tên
+            { wch: 20 }, // Học hàm
+            { wch: 15 }, // Học vị
+            { wch: 30 }, // Tổng số sự kiện đã tham gia
+            { wch: 18 }  // Tổng số điểm
+        ];
+        worksheet['!cols'] = columnWidths;
+
+        // Style cho header row (màu vàng theo yêu cầu)
+        const headerRange = XLSX.utils.decode_range('A1:F1');
+        for (let col = headerRange.s.c; col <= headerRange.e.c; col++) {
+            const cellAddress = XLSX.utils.encode_cell({ r: 0, c: col });
+            if (!worksheet[cellAddress]) worksheet[cellAddress] = {};
+            worksheet[cellAddress].s = {
+                font: { bold: true, color: { rgb: "000000" } },
+                fill: { fgColor: { rgb: "FFD700" } },
+                alignment: { horizontal: "center", vertical: "center" },
+                border: {
+                    top: { style: "thin", color: { rgb: "000000" } },
+                    bottom: { style: "thin", color: { rgb: "000000" } },
+                    left: { style: "thin", color: { rgb: "000000" } },
+                    right: { style: "thin", color: { rgb: "000000" } }
+                }
+            };
+        }
+
+        // Style cho các dòng dữ liệu (zebra striping như trong bảng)
+        for (let row = 1; row <= sortedData.length; row++) {
+            const isEvenRow = row % 2 === 0;
+            const fillColor = isEvenRow ? "F8F9FA" : "FFFFFF";
+
+            for (let col = 0; col < 6; col++) {
+                const cellAddress = XLSX.utils.encode_cell({ r: row, c: col });
+                if (!worksheet[cellAddress]) worksheet[cellAddress] = {};
+                worksheet[cellAddress].s = {
+                    fill: { fgColor: { rgb: fillColor } },
+                    border: {
+                        top: { style: "thin", color: { rgb: "CCCCCC" } },
+                        bottom: { style: "thin", color: { rgb: "CCCCCC" } },
+                        left: { style: "thin", color: { rgb: "CCCCCC" } },
+                        right: { style: "thin", color: { rgb: "CCCCCC" } }
+                    },
+                    alignment: {
+                        horizontal: col === 0 || col >= 4 ? "center" : "left",
+                        vertical: "center"
+                    }
+                };
+            }
+        }
+
+        // Thêm worksheet vào workbook
+        XLSX.utils.book_append_sheet(workbook, worksheet, 'Báo cáo tổng thể');
+
+        // Xuất file Excel
+        const fileName = `bao-cao-tong-the-${new Date().toISOString().split('T')[0]}.xlsx`;
+        XLSX.writeFile(workbook, fileName);
     }
 
     public exportToPDF(): void {
